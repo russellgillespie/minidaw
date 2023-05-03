@@ -44,11 +44,11 @@ var fadeOuts = [];
 
 //Production urls
 var urls = [
- "./audio/DTNN_INTERVIEW BUS.mp3",
- "./audio/DTNN_SFX BUS.mp3",
- "./audio/DTNN_MUSIC BUS.mp3",
- "./audio/DTNN_AMBI BUS.mp3",
- "./audio/DTNN_STUDIO BUS.mp3"
+  "./audio/DTNN_AMBI BUS.mp3",
+  "./audio/DTNN_INTERVIEW BUS.mp3",
+  "./audio/DTNN_MUSIC BUS.mp3",
+  "./audio/DTNN_SFX BUS.mp3",
+  "./audio/DTNN_STUDIO BUS.mp3"
 ]
 // Placeholder URLs
 //  var urls = [
@@ -184,7 +184,7 @@ playAll.dataset.playing = false;
 // });
 
 // Get references to audio element durations and add to durations array
-const masterDuration = 90;
+const masterDuration = 353;
 const duration0 = document.querySelector('#duration0');
 durations.push(duration0);
 const duration1 = document.querySelector('#duration1');
@@ -193,6 +193,8 @@ const duration2 = document.querySelector('#duration2');
 durations.push(duration2);
 const duration3 = document.querySelector('#duration3');
 durations.push(duration3);
+const duration4 = document.querySelector('#duration4');
+durations.push(duration4);
 
 // Get references to volume/gain slider elements
 var volumeControlAll = document.querySelector('#gainAll');
@@ -210,6 +212,7 @@ const volumeDisplay0 = document.querySelector('#gain0Display');
 const volumeDisplay1 = document.querySelector('#gain1Display');
 const volumeDisplay2 = document.querySelector('#gain2Display');
 const volumeDisplay3 = document.querySelector('#gain3Display');
+const volumeDisplay4 = document.querySelector('#gain4Display');
 
 // Get references to pan slider elements
 const panControlAll = document.querySelector('#panAll');
@@ -217,6 +220,7 @@ const panControl0 = document.querySelector('#pan0');
 const panControl1 = document.querySelector('#pan1');
 const panControl2 = document.querySelector('#pan2');
 const panControl3 = document.querySelector('#pan3');
+const panControl4 = document.querySelector('#pan4');
 
 // Get references to pan number input elements
 const panDisplayAll = document.querySelector('#panAllDisplay');
@@ -224,6 +228,7 @@ const panDisplay0 = document.querySelector('#pan0Display');
 const panDisplay1 = document.querySelector('#pan1Display');
 const panDisplay2 = document.querySelector('#pan2Display');
 const panDisplay3 = document.querySelector('#pan3Display');
+const panDisplay4 = document.querySelector('#pan4Display');
 
 const fadeInAll = document.querySelector('#fadeInAll');
 const fadeOutAll = document.querySelector('#fadeOutAll');
@@ -361,6 +366,10 @@ volumeControls[3].addEventListener('input', function() {
  gainNodes[3].gain.linearRampToValueAtTime(this.value * this.value * gainScale, ctx.currentTime + .001);
   //console.log(gainNodes[3].gain.value);
 }, false);
+volumeControls[4].addEventListener('input', function() {
+ gainNodes[4].gain.linearRampToValueAtTime(this.value * this.value * gainScale, ctx.currentTime + .001);
+  //console.log(gainNodes[4].gain.value);
+}, false);
 
 // // Gain Number inputs
 // volumeDisplayAll.addEventListener('input', function() {
@@ -378,7 +387,7 @@ volumeControls[3].addEventListener('input', function() {
 //  gainNodes[2].gain.value = this.value;
 //   //console.log(gainNodes[2].gain.value);
 // }, false);
-// volumeDisplay3.addEventListener('input', function() {
+// volumeDisplay4.addEventListener('input', function() {
 //  gainNodes[3].gain.value = this.value;
 //   //console.log(gainNodes[3].gain.value);
 // }, false);
@@ -403,6 +412,10 @@ panControl2.addEventListener('input', function() {
 panControl3.addEventListener('input', function() {
  // panNodes[3].pan.value = this.value;
   panNodes[3].setPosition(this.value, 0, pannerSettings.position[2]);
+}, false);
+panControl4.addEventListener('input', function() {
+ // panNodes[4].pan.value = this.value;
+  panNodes[4].setPosition(this.value, 0, pannerSettings.position[2]);
 }, false);
 
 // // Pan number inputs
@@ -605,6 +618,7 @@ function PlayTrack(_index, _playheadOffset) {
   //console.log("when " + (wh));
   //console.log(gainNodes[_index].gain.setTargetAtTime);
 
+  console.log("FadeIn Index: " + _index);
   if (fadeIns[_index].value > 0)
   {
     try
@@ -659,7 +673,6 @@ function PlayAllTracks() {
     urls.forEach(function(_url, _index, _urls) {
       PlayTrack(_index, playheadTime);
     })
-
 
     //Schedule Master Fade In
     if (fadeInAll.value > 0)
@@ -1029,7 +1042,7 @@ function makeResizableDiv(div) {
 }
 
 //Initialize App
-const tracks = ['track0', 'track1', 'track2', 'track3']
+const tracks = ['track0', 'track1', 'track2', 'track3', 'track4']
 
 window.onload = function() {
   init();
