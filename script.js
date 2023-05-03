@@ -20,7 +20,7 @@ var pannerSettings = {
 
 var pannerSacleFactor = 2;
 var gainScale = 3;
-      
+
 var listener = "";
 
 var bufferLoader;
@@ -41,13 +41,24 @@ var fadeOuts = [];
 //   "https://solsticemanagementdiag.blob.core.windows.net/externalapitesting/APM_Adobe_Going Home_v3.mp3",
 //   "https://solsticemanagementdiag.blob.core.windows.net/externalapitesting/Audio_Postcard_Dumpster.mp3"
 // ]
+
 //Production urls
- var urls = [
-  "Going_Home_VO.mp3",
-  "Going_Home_SFX.mp3",
-  "APM_Adobe_Going_Home_v3.mp3",
-  "Audio_Postcard_Dumpster.mp3"
+var urls = [
+ "./audio/DTNN_INTERVIEW BUS.mp3",
+ "./audio/DTNN_SFX BUS.mp3",
+ "./audio/DTNN_MUSIC BUS.mp3",
+ "./audio/DTNN_AMBI BUS.mp3",
+ "./audio/DTNN_STUDIO BUS.mp3"
 ]
+// Placeholder URLs
+//  var urls = [
+//   "Going_Home_VO.mp3",
+//   "Going_Home_SFX.mp3",
+//   "APM_Adobe_Going_Home_v3.mp3",
+//   "Audio_Postcard_Dumpster.mp3"
+// ]
+
+
 
 var gainNodeAll;
 var panNodeAll;
@@ -64,9 +75,9 @@ function init() {
   bufferLoader = new BufferLoader(ctx, urls, finishedLoading);
   bufferLoader.load();
   initRouting();
-  
+
   unlockAudioContext(ctx);
-  
+
   for (var i=0; i < urls.length; i++) {
     let current_track = document.querySelector('#track' + i)
     if (current_track.dataset.playheadOffset === undefined) { current_track.dataset.playheadOffset = 0 };
@@ -117,8 +128,8 @@ playheadElement.innerHTML = formatTime(0);
 //   updateInput('playheadOffset', this.valueAsNumber.toFixed(3));
 //   // playheadTime = this.value;
 //   // playheadElement.innerHTML = formatTime(this.value * 1000);
-    
-//   //setTimeout(resetGainValues(gainCache), .15); 
+
+//   //setTimeout(resetGainValues(gainCache), .15);
 // }, false)
 
 // playheadSlider.addEventListener('mouseup', function() {
@@ -136,7 +147,7 @@ playheadElement.innerHTML = formatTime(0);
 //     //}, .25);
 //  // }
 //   }
-  
+
 // });
 
 // playheadOffset.addEventListener('input', function() {
@@ -223,7 +234,7 @@ urls.forEach(function(_url, _index, _urls) {
 
 //// Add event listeners for playback buttons
 // playTrackButtons.forEach(function(_button, _index, _buttons){
-//   playTrackButtons[_index].addEventListener('click', () => { 
+//   playTrackButtons[_index].addEventListener('click', () => {
 //   PlayTrack(_index, playheadTime);
 // }, false);
 // });
@@ -235,7 +246,7 @@ playAll.addEventListener('click', function() {
 }, false);
 
 window.addEventListener("keydown", event => {
-  if (event.keyCode === 32) 
+  if (event.keyCode === 32)
   {
     console.log("pressed spacebar");
     if (playAll.dataset.playing === 'false')
@@ -247,8 +258,8 @@ window.addEventListener("keydown", event => {
       PauseAllTracks();
     }
   }
-  
-  if (event.keyCode === 13) 
+
+  if (event.keyCode === 13)
   {
     console.log('pressed return key');
     if (playAll.dataset.playing === 'true')
@@ -261,8 +272,8 @@ window.addEventListener("keydown", event => {
     // playheadOffset.value = playheadTime;
     playheadSlider.value = playheadTime;
     }, 10);
-  }     
-  
+  }
+
 }, false);
 
 // playAll.addEventListener('touchstart', function(event) {
@@ -277,7 +288,7 @@ window.addEventListener("keydown", event => {
 pauseAll.addEventListener('click', function() {
   PauseAllTracks();
 }, false);
-  
+
 // pauseAll.addEventListener("keydown", event => {
 //   if (event.isComposing || event.keyCode === 32) {
 //     PlayAllTracks();
@@ -320,7 +331,7 @@ returnAll.addEventListener('touchstart', (event) => {
 
 
 
-//// Add event listeners to trigger audio elements ended callback 
+//// Add event listeners to trigger audio elements ended callback
 // playTrackButtons.forEach(function(_button, _index, _buttons){
 //   sources[_index].addEventListener('ended', () => {
 //   _button.dataset.playing = 'false';
@@ -437,8 +448,8 @@ function initRouting(){
   gainNodeAll = ctx.createGain();
   // Route masterPan > masterGain > Final Output Destination
   // try {
-  //   panNodeAll = ctx.createStereoPanner();  
-  //   panNodeAll.connect(gainNodeAll).connect(ctx.destination);  
+  //   panNodeAll = ctx.createStereoPanner();
+  //   panNodeAll.connect(gainNodeAll).connect(ctx.destination);
   // }
   // catch (e) {
   //   if (e instanceof TypeError) {
@@ -448,16 +459,16 @@ function initRouting(){
   //   }
   // }
   panNodeAll = ctx.createPanner();
-  panNodeAll.connect(gainNodeAll).connect(ctx.destination);  
+  panNodeAll.connect(gainNodeAll).connect(ctx.destination);
   initPannerNode(panNodeAll, pannerSettings);
-    
+
   // Create and Route all Basic Tracks
   urls.forEach(function(_url, _index, _urls){
-    
+
     panNodes[_index] = ctx.createPanner();
     initPannerNode(panNodes[_index], pannerSettings);
-    
-      
+
+
     gainNodes[_index] = ctx.createGain();
     gainNodes[_index].gain.value = volumeControls[_index].valueAsNumber * volumeControls[_index].valueAsNumber * gainScale;
     panNodes[_index].connect(gainNodes[_index]).connect(panNodeAll);
@@ -483,7 +494,7 @@ function UpdatePlayheadTime(_displayElement, _increment, _buttons)
            // playheadOffset.value = newPlayheadTime;
         }
         //console.log(typeof(playheadSlider.value));
-        
+
         //if ( CheckIfPlaying(_buttons) )
         if (playheadRunning === 'true')
         {
@@ -505,13 +516,13 @@ function resetTime(_value){
   return 0;
 }
 
-function updateInput(target, val) 
+function updateInput(target, val)
 {
   var element = document.getElementById(target);
-  if (element.value != val) 
+  if (element.value != val)
   {
     //console.log(typeof(element.value));
-    element.value = val;     
+    element.value = val;
   }
 }
 
@@ -521,7 +532,7 @@ function formatTime(_time)
   var sec = hun * 100;
   var min = sec * 60;
   var hr = min * 60;
-  
+
   var hours = Math.trunc(_time / hr);
   //console.log(_time % hr);
   var minutes = Math.trunc((_time % hr) / min);
@@ -529,12 +540,12 @@ function formatTime(_time)
   var seconds = Math.trunc((_time % min) / sec);
   //console.log(_time % sec);
   var hundredths = Math.trunc((_time % sec) / hun);
-  
+
   if (hours < 10) { hours = "0" + hours;}
   if (minutes < 10) { minutes = "0" + minutes;}
   if (seconds < 10) { seconds = "0" + seconds;}
   if (hundredths < 10) { hundredths = "0" + hundredths;}
-  
+
   return (minutes + ":" + seconds + ":" + hundredths);
 }
 
@@ -553,7 +564,7 @@ function formatTime(_time)
 // }
 
 function ResumeContext() {
-  if (ctx.state === 'suspended') 
+  if (ctx.state === 'suspended')
     {
       ctx.resume();
     }
@@ -576,14 +587,14 @@ function PlayTrack(_index, _playheadOffset) {
   let track_offset = parseFloat(current_track.dataset.playheadOffset);
   let track_start_trim = parseFloat(current_track.dataset.startTrim);
   let track_end_trim = parseFloat(current_track.dataset.endTrim);
-  
+
   let wh = ctx.currentTime + track_offset - _playheadOffset;
   if ( wh < 0 ) { wh = 0; }
   let off = _playheadOffset - track_offset + track_start_trim;
   if ( off < 0 ) { off = 0; }
   let dur = track_end_trim - off;
   if ( dur < 0 ) { dur = 0; }
-  
+
   if (track_start_trim < 0) { track_start_trim = 0; }
   sources[_index].start(wh, off, dur)
   //console.log(panNodeAll);
@@ -593,8 +604,8 @@ function PlayTrack(_index, _playheadOffset) {
   //console.log("initialGain: " + initialGain)
   //console.log("when " + (wh));
   //console.log(gainNodes[_index].gain.setTargetAtTime);
-  
-  if (fadeIns[_index].value > 0) 
+
+  if (fadeIns[_index].value > 0)
   {
     try
     {
@@ -608,7 +619,7 @@ function PlayTrack(_index, _playheadOffset) {
       gainNodes[_index].gain.setValueAtTime(volumeControls[_index].value, ctx.currentTime);
     }
   }
-  
+
   //console.log("fadeOut" + [_index] + ": " + (wh + dur - parseFloat(fadeOuts[_index].value)));
   //Schedule Fade Out for Current Track
   if (fadeOuts[_index].value > 0)
@@ -623,7 +634,7 @@ function PlayTrack(_index, _playheadOffset) {
       gainNodes[_index].gain.setValueAtTime(volumeControls[_index].value, ctx.currentTime);
     }
   }
-  
+
 
 }
 
@@ -648,12 +659,12 @@ function PlayAllTracks() {
     urls.forEach(function(_url, _index, _urls) {
       PlayTrack(_index, playheadTime);
     })
-    
-    
+
+
     //Schedule Master Fade In
     if (fadeInAll.value > 0)
     {
-      try 
+      try
       {
         gainNodeAll.gain.linearRampToValueAtTime(0, ctx.currentTime);
         //console.log("resetGain: " + gainNodeAll.gain.value);
@@ -680,8 +691,8 @@ function PlayAllTracks() {
         gainNodeAll.gain.linearRampToValueAtTime(0, masterDuration - playheadStartTime - parseFloat(fadeOutAll.value), 0.8);
       }
     }
-    
-    
+
+
     playAll.dataset.playing = 'true';
     playheadRunning = 'true';
     startTime = ctx.currentTime;
@@ -699,7 +710,7 @@ function PauseAllTracks() {
     //   gain = (gainNodes[_index].gain.value);
     //   gainNodes[_index].gain.linearRampToValueAtTime(.001, fadeTime);
     //   setTimeout(function (){sources[_index].stop();}, fadeTime);
-      sources[_index].stop();  
+      sources[_index].stop();
       //console.log(gainNodes[_index]);
       gainNodes[_index].gain.cancelScheduledValues(ctx.currentTime);
       //console.log(volumeControls[_index].value)
@@ -710,7 +721,7 @@ function PauseAllTracks() {
   gainNodeAll.gain.cancelScheduledValues(ctx.currentTime);
   gainNodeAll.gain.setValueAtTime(volumeControlAll.value, ctx.currentTime);
   if (playAll.dataset.playing == 'true') {
-    
+
   playAll.dataset.playing = 'false';
   playheadRunning = 'false';
   }
@@ -765,7 +776,7 @@ function makeMoveableDiv(div) {
       window.addEventListener('mouseup', stopMoveDiv)
     })
   }
-  
+
 
   function moveDiv(e) {
     let new_pos = parseInt(original_x_left - (original_mouse_x - e.pageX) - offset_x);
@@ -775,7 +786,7 @@ function makeMoveableDiv(div) {
     // console.log(moverWidth + new_pos);
     if (new_pos < min_left) {
       new_pos = min_left;
-    } 
+    }
     if (new_pos + moverWidth > max_right) {
       new_pos = max_right - moverWidth;
     }
@@ -787,15 +798,15 @@ function makeMoveableDiv(div) {
     //console.log("right: " + currentMover.style.right);
     let farRight = new_pos + moverWidth;
     //document.querySelector('.debug').innerHTML = "moving, currentMover.style.width: " + (farRight);
-    
+
     currentMover.dataset.playheadOffset = parseFloat(((new_pos - min_left) / maximum_size) * masterDuration).toFixed(2); //milliseconds
     // console.log("offset: " + currentMover.dataset.playheadOffset);
-    // document.querySelector('.debug').innerHTML = 
-    //   "offset: "  + currentMover.dataset.playheadOffset + 
-    //   ", startTrim: " + currentMover.dataset.startTrim + 
+    // document.querySelector('.debug').innerHTML =
+    //   "offset: "  + currentMover.dataset.playheadOffset +
+    //   ", startTrim: " + currentMover.dataset.startTrim +
     //   ", endTrim: " + currentMover.dataset.endTrim;
   }
-  
+
   function stopMoveDiv() {
     //document.querySelector('.debug').innerHTML = "moved";
     window.removeEventListener('mousemove', moveDiv)
@@ -822,7 +833,7 @@ function makeResizableDiv(div) {
   let mouseOffsetLeft = 0;
   let originalColor = "";
   let error_color  = "#bc1413";
-  
+
   for (let i = 0;i < resizers.length; i++) {
     const currentResizer = resizers[i];
     originalColor = currentResizer.style.backgroundColor;
@@ -842,15 +853,15 @@ function makeResizableDiv(div) {
       window.addEventListener('mouseup', stopResize)
     })
 
-    function resize(e) 
+    function resize(e)
     {
-      if (currentResizer.classList.contains('bottom-right') || currentResizer.classList.contains('side-right')) 
+      if (currentResizer.classList.contains('bottom-right') || currentResizer.classList.contains('side-right'))
       {
         // Get right edge position in pixels and parse
         let originalTrim = parseFloat(element.style.right); //548 offset_x + min_left + max_width
         //console.log("originalTrim: " + originalTrim);
-        
-        if (Number.isNaN(originalTrim)) 
+
+        if (Number.isNaN(originalTrim))
         {
           originalTrim = max_right; //548
         }
@@ -859,18 +870,18 @@ function makeResizableDiv(div) {
         let newTrim = 0.0; //initialize new trim variable
         mouseX = e.pageX + mouseOffsetRight; // current click-drag position
         // Clamp mouse position input to right edge
-        if (mouseX > max_right) 
-        { 
-          mouseX = max_right;           
+        if (mouseX > max_right)
+        {
+          mouseX = max_right;
         }
         original_mouse_x = original_x_right;
         //console.log("ogMouseX: " + original_mouse_x);
         // Calculate new width of div
         const width = original_width - (original_x_right - mouseX);
         //console.log("width: " + width);
-        
+
         //check that width is in bounds
-        if (width >= minimum_size && width <= maximum_size) 
+        if (width >= minimum_size && width <= maximum_size)
         {
           // Trim duration if not exceeding max time
           if (startTrim <= 0)
@@ -883,17 +894,17 @@ function makeResizableDiv(div) {
           }
           //console.log("start trim: " + startTrim);
           newTrim = parseFloat(startTrim - masterDuration * ((originalTrim - mouseX) / maximum_size));
-          
+
           if (newTrim <= masterDuration && newTrim >= 0)
           {
             element.dataset.endTrim = newTrim;
             element.style.width = width + 'px';
             element.style.right = original_x_left + width + 'px';
           }
-          
-          if (masterDuration - newTrim < .01) 
+
+          if (masterDuration - newTrim < .01)
           {
-            resizers.forEach (function(_resizer, _index, _arr) 
+            resizers.forEach (function(_resizer, _index, _arr)
             {
              let r = resizers[_index];
              if (r.classList.contains('side-right') || r.classList.contains('bottom-right'))
@@ -902,9 +913,9 @@ function makeResizableDiv(div) {
               }
             })
           }
-          else 
+          else
           {
-            resizers.forEach (function(_resizer, _index, _arr) 
+            resizers.forEach (function(_resizer, _index, _arr)
             {
              let r = resizers[_index];
              if (r.classList.contains('side-right') || r.classList.contains('bottom-right'))
@@ -913,13 +924,13 @@ function makeResizableDiv(div) {
               }
             })
           }
-          
+
         }
       } // End Right Resizers Conditionals
-      else if (currentResizer.classList.contains('bottom-left') || currentResizer.classList.contains('side-left')) 
+      else if (currentResizer.classList.contains('bottom-left') || currentResizer.classList.contains('side-left'))
       {
         let originalTrim = parseFloat(element.getBoundingClientRect().left);
-        if (originalTrim === "" || Number.isNaN(originalTrim)) 
+        if (originalTrim === "" || Number.isNaN(originalTrim))
         {
           originalTrim = min_left; //116
         }
@@ -927,7 +938,7 @@ function makeResizableDiv(div) {
         let startTrim = parseFloat(element.dataset.startTrim);
         //console.log("st: " + startTrim); //0
         let newTrim = 0.0;
-        
+
         //get current mouse X position
         mouseX = e.pageX - mouseOffsetLeft; // current click-drag position
         //clamp mouseX to left edge of draggable area
@@ -938,7 +949,7 @@ function makeResizableDiv(div) {
         //console.log("oxr: " + original_x_right);
         //console.log("width: " + width);
         //Check if width is in bounds
-        if (width >= minimum_size && width <= maximum_size ) 
+        if (width >= minimum_size && width <= maximum_size )
         {
           //left = mouseX;
           //
@@ -947,22 +958,22 @@ function makeResizableDiv(div) {
             newTrim = startTrim;
             //console.log("mouseX: " + mouseX + ", newTrim: " + newTrim);
             element.dataset.startTrim = newTrim;
-          } 
-          else if (mouseX >= min_left) 
+          }
+          else if (mouseX >= min_left)
           {
             newTrim = (startTrim + masterDuration * ((mouseX - originalTrim) / maximum_size)).toFixed(4);
             //clamp trim to duration range 0-90
-            if (newTrim > masterDuration) 
-            { 
-              newTrim = masterDuration; 
+            if (newTrim > masterDuration)
+            {
+              newTrim = masterDuration;
             }
-            else if ( newTrim <= 0 ) 
-            { 
-              newTrim = 0; 
+            else if ( newTrim <= 0 )
+            {
+              newTrim = 0;
             }
             //console.log("mouseX: " + mouseX + ", newTrim: " + newTrim);
-            
-            if (element.dataset.startTrim != newTrim && element.dataset.startTrim >= 0 ) 
+
+            if (element.dataset.startTrim != newTrim && element.dataset.startTrim >= 0 )
             {
               element.dataset.startTrim = newTrim;
               element.style.left = (mouseX - offset_x) + 'px';
@@ -972,11 +983,11 @@ function makeResizableDiv(div) {
               element.querySelector(".waveform").style.backgroundPosition = -4.8 * newTrim + "px, 50%";
               //console.log(newTrim.toFixed(2) + "px, 0px");
             }
-            
-              // Color resizers red if at end of audio clip length  
-              if (newTrim < .001) 
+
+              // Color resizers red if at end of audio clip length
+              if (newTrim < .001)
               {
-                resizers.forEach (function(_resizer, _index, _arr) 
+                resizers.forEach (function(_resizer, _index, _arr)
                 {
                   let r = resizers[_index];
                   if (r.classList.contains('side-left') || r.classList.contains('bottom-left'))
@@ -985,9 +996,9 @@ function makeResizableDiv(div) {
                   }
                 })
               }
-              else 
+              else
               {
-                resizers.forEach (function(_resizer, _index, _arr) 
+                resizers.forEach (function(_resizer, _index, _arr)
                 {
                  let r = resizers[_index];
                  if (r.classList.contains('side-left') || r.classList.contains('bottom-left'))
@@ -999,11 +1010,11 @@ function makeResizableDiv(div) {
           }
         }
       } // End Left Resizers Conditionals
-      
-      
-      // document.querySelector('.debug').innerHTML = 
-      //   "offset: "  + element.dataset.playheadOffset + 
-      //   ", startTrim: " + element.dataset.startTrim + 
+
+
+      // document.querySelector('.debug').innerHTML =
+      //   "offset: "  + element.dataset.playheadOffset +
+      //   ", startTrim: " + element.dataset.startTrim +
       //   ", endTrim: " + element.dataset.endTrim;
       //console.log("exit endTrim: " + element.dataset.endTrim);
     } // End function resize

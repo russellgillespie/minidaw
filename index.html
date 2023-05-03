@@ -14,28 +14,28 @@
 <script src="./BufferLoader.js"></script>
 
 <div class="daw-wrapper">
-  
+
   <div class="row" id="rowMaster">
     <div class="header column" id="headerMaster">
       <div class="label row" id="labelMaster">
         <h4>Master Track</h4>
       </div>
-      
+
       <div class="row transport">
-        <input type="image" id="returnAll" src="./returnButton.png" width="25px" height="25px"></input>
-        <input type="image" id="pauseAll" src="./pauseButton.png" width="25px" height="25px"></input>
-        <input type="image" id="playAll" data-playing="false" src="./playButton.png" width="25px" height="25px" role="switch" aria-checked="false">
+        <input type="image" id="returnAll" src="./img/returnButton.png" width="25px" height="25px"></input>
+        <input type="image" id="pauseAll" src="./img/pauseButton.png" width="25px" height="25px"></input>
+        <input type="image" id="playAll" data-playing="false" src="./img/playButton.png" width="25px" height="25px" role="switch" aria-checked="false">
       </div><!-- transport -->
       <div class="row volume-controls">
         <div class="volume-label column">
-          <img src="./mutedButton.png"width="15px" height="15px"></img>
+          <img src="./img/mutedButton.png"width="15px" height="15px"></img>
         </div>
         <div class="volume-slider column">
           <input id="gainAll" type="range" min="0" max="1" value=".5" step="0.01">
         </div>
         <div class="volume-label column">
-          <img type="image" src="./unmutedButton.png"width="15px" height="15px"></img>
-        </div> 
+          <img type="image" src="./img/unmutedButton.png"width="15px" height="15px"></img>
+        </div>
       </div> <!-- volume controls -->
 
       <div class="row pan-controls">
@@ -43,13 +43,13 @@
         <div class="pan-slider column">
           <input id="panAll" type="range" min="-4" max="4" value="0" step="0.01">
         </div>
-        <div class="pan-label column">R</div> 
+        <div class="pan-label column">R</div>
       </div> <!-- pan controls -->
-      
+
       <div class="fade-controls row">
         <div class="fade-label column">
-          <img type="image" src="./fadeIn.png"width="10px" height="15px" role="switch"></img>
-        </div> 
+          <img type="image" src="./img/fadeIn.png"width="10px" height="15px" role="switch"></img>
+        </div>
          <div class="fade-input column">
           <input id="fadeInAll" type="number" min='0' max='30' value='0.0' step="0.1">
         </div>
@@ -57,8 +57,8 @@
           <input id="fadeOutAll" type="number" min='0' max='30' value='0.0' step="0.1">
         </div>
         <div class="fade-label column">
-          <img type="image" src="./fadeOut.png"width="10px" height="15px" role="switch"></img>
-        </div> 
+          <img type="image" src="./img/fadeOut.png"width="10px" height="15px" role="switch"></img>
+        </div>
       </div> <!-- fade controls -->
 
 
@@ -88,23 +88,23 @@
       </div> <!-- timeline row  -->
     </div>
   </div> <!-- row master -->
-  
+
   <div class="row track-row" id="row0">
     <div class="header column" id="header0">
       <div class="label" id="label0">
-        <h4>Voice Over</h4>
+        <h4>Ambience</h4>
       </div>
-      
+
         <div class="row volume-controls">
           <div class="volume-label column">
-            <img src="./mutedButton.png"width="15px" height="15px"></img>
+            <img src="./img/mutedButton.png"width="15px" height="15px"></img>
           </div>
           <div class="volume-slider column">
             <input id="gain0" type="range" min="0" max="1" value=".5" step="0.01">
           </div>
           <div class="volume-label column">
-            <img type="image" src="./unmutedButton.png"width="15px" height="15px" role="switch"></img>
-          </div> 
+            <img type="image" src="./img/unmutedButton.png"width="15px" height="15px" role="switch"></img>
+          </div>
         </div> <!-- volume controls -->
 
       <div class="row pan-controls">
@@ -112,13 +112,13 @@
         <div class="pan-slider column">
           <input id="pan0" type="range" min="-4" max="4" value="0" step="0.01">
         </div>
-        <div class="pan-label column">R</div> 
+        <div class="pan-label column">R</div>
       </div> <!-- pan controls -->
-      
+
       <div class="fade-controls row">
         <div class="fade-label column">
-          <img type="image" src="./fadeIn.png"width="10px" height="15px" role="switch"></img>
-        </div> 
+          <img type="image" src="./img/fadeIn.png"width="10px" height="15px" role="switch"></img>
+        </div>
          <div class="fade-input column">
           <input id="fadeIn0" type="number" min='0' max='30' value='0.0' step="0.1">
         </div>
@@ -126,13 +126,13 @@
           <input id="fadeOut0" type="number" min='0' max='30' value='0.0' step="0.1">
         </div>
         <div class="fade-label column">
-          <img type="image" src="./fadeOut.png"width="10px" height="15px" role="switch"></img>
-        </div> 
+          <img type="image" src="./img/fadeOut.png"width="10px" height="15px" role="switch"></img>
+        </div>
       </div> <!-- fade controls -->
 
     </div>
     <div class="track column resizable moveable" id="track0">
-      <p>Narration_F_04.mp3</p>
+      <p>DTNN_AMBI BUS.mp3</p>
       <div class="trackLabel row resizers" id="trackLabel0">
         <div class="waveform"></div>
         <div class='resizer side-left'></div>
@@ -142,23 +142,23 @@
       </div>
     </div>
   </div>
-  
+
   <div class="row" id="row1">
     <div class="header column" id="header1">
       <div class="label" id="label1">
-        <h4>SFX</h4>
+        <h4>Interview</h4>
       </div>
-      
+
             <div class="row volume-controls">
         <div class="volume-label column">
-          <img src="./mutedButton.png"width="15px" height="15px"></img>
+          <img src="./img/mutedButton.png"width="15px" height="15px"></img>
         </div>
         <div class="volume-slider column">
           <input id="gain1" type="range" min="0" max="1" value=".5" step="0.01">
         </div>
         <div class="volume-label column">
-          <img type="image" src="./unmutedButton.png"width="15px" height="15px" role="switch"></img>
-        </div> 
+          <img type="image" src="./img/unmutedButton.png"width="15px" height="15px" role="switch"></img>
+        </div>
       </div> <!-- volume controls -->
 
       <div class="row pan-controls">
@@ -166,13 +166,13 @@
         <div class="pan-slider column">
           <input id="pan1" type="range" min="-4" max="4" value="0" step="0.01">
         </div>
-        <div class="pan-label column">R</div> 
+        <div class="pan-label column">R</div>
       </div> <!-- pan controls -->
-      
+
       <div class="fade-controls row">
         <div class="fade-label column">
-          <img type="image" src="./fadeIn.png"width="10px" height="15px" role="switch"></img>
-        </div> 
+          <img type="image" src="./img/fadeIn.png"width="10px" height="15px" role="switch"></img>
+        </div>
          <div class="fade-input column">
           <input id="fadeIn1" type="number" min='0' max='30' value='0.0' step="0.1">
         </div>
@@ -180,13 +180,13 @@
           <input id="fadeOut1" type="number" min='0' max='30' value='0.0' step="0.1">
         </div>
         <div class="fade-label column">
-          <img type="image" src="./fadeOut.png"width="10px" height="15px" role="switch"></img>
-        </div> 
+          <img type="image" src="./img/fadeOut.png"width="10px" height="15px" role="switch"></img>
+        </div>
       </div> <!-- fade controls -->
 
     </div>
     <div class="track column resizable moveable" id="track1">
-      <p>SFX_comp_01.mp3</p>
+      <p>DTNN_INTERVIEW BUS.mp3</p>
       <div class="trackLabel row resizers" id="trackLabel1">
         <div class="waveform"></div>
         <div class='resizer side-left'></div>
@@ -196,23 +196,23 @@
       </div>
     </div>
   </div>
-  
+
   <div class="row" id="row2">
     <div class="header column" id="header2">
       <div class="label" id="label2">
         <h4>Music</h4>
       </div>
-      
+
             <div class="row volume-controls">
         <div class="volume-label column">
-          <img src="./mutedButton.png"width="15px" height="15px"></img>
+          <img src="./img/mutedButton.png"width="15px" height="15px"></img>
         </div>
         <div class="volume-slider column">
           <input id="gain2" type="range" min="0" max="1" value=".5" step="0.01">
         </div>
         <div class="volume-label column">
-          <img type="image" src="./unmutedButton.png"width="15px" height="15px" role="switch"></img>
-        </div> 
+          <img type="image" src="./img/unmutedButton.png"width="15px" height="15px" role="switch"></img>
+        </div>
       </div> <!-- volume controls -->
 
       <div class="row pan-controls">
@@ -220,13 +220,13 @@
         <div class="pan-slider column">
           <input id="pan2" type="range" min="-4" max="4" value="0" step="0.01">
         </div>
-        <div class="pan-label column">R</div> 
+        <div class="pan-label column">R</div>
       </div> <!-- pan controls -->
 
       <div class="fade-controls row">
         <div class="fade-label column">
-          <img type="image" src="./fadeIn.png"width="10px" height="15px" role="switch"></img>
-        </div> 
+          <img type="image" src="./img/fadeIn.png"width="10px" height="15px" role="switch"></img>
+        </div>
          <div class="fade-input column">
           <input id="fadeIn2" type="number" min='0' max='30' value='0.0' step="0.1">
         </div>
@@ -234,13 +234,13 @@
           <input id="fadeOut2" type="number" min='0' max='30' value='0.0' step="0.1">
         </div>
         <div class="fade-label column">
-          <img type="image" src="./fadeOut.png"width="10px" height="15px" role="switch"></img>
-        </div> 
+          <img type="image" src="./img/fadeOut.png"width="10px" height="15px" role="switch"></img>
+        </div>
       </div> <!-- fade controls -->
 
     </div>
     <div class="track column resizable moveable" id="track2">
-      <p>Underscore_02.mp3</p>
+      <p>DTNN_MUSIC BUS.mp3</p>
       <div class="trackLabel row resizers" id="trackLabel2">
         <div class="waveform"></div>
         <div class='resizer side-left'></div>
@@ -249,23 +249,23 @@
         <div class='resizer bottom-right'></div></div>
     </div>
   </div>
-  
+
   <div class="row" id="row3">
     <div class="header column" id="header3">
       <div class="label" id="label3">
-        <h4>Ambience</h4>
+        <h4>SFX</h4>
       </div>
-      
+
             <div class="row volume-controls">
         <div class="volume-label column">
-          <img src="./mutedButton.png"width="15px" height="15px"></img>
+          <img src="./img/mutedButton.png"width="15px" height="15px"></img>
         </div>
         <div class="volume-slider column">
           <input id="gain3" type="range" min="0" max="1" value=".5" step="0.01">
         </div>
         <div class="volume-label column">
-          <img type="image" src="./unmutedButton.png"width="15px" height="15px" role="switch"></img>
-        </div> 
+          <img type="image" src="./img/unmutedButton.png"width="15px" height="15px" role="switch"></img>
+        </div>
       </div> <!-- volume controls -->
 
       <div class="row pan-controls">
@@ -273,13 +273,13 @@
         <div class="pan-slider column">
           <input id="pan3" type="range" min="-4" max="4" value="0" step="0.01">
         </div>
-        <div class="pan-label column">R</div> 
+        <div class="pan-label column">R</div>
       </div> <!-- pan controls -->
 
       <div class="fade-controls row">
         <div class="fade-label column">
-          <img type="image" src="./fadeIn.png"width="10px" height="15px" role="switch"></img>
-        </div> 
+          <img type="image" src="./img/fadeIn.png"width="10px" height="15px" role="switch"></img>
+        </div>
          <div class="fade-input column">
           <input id="fadeIn3" type="number" min='0' max='30' value='0.0' step="0.1">
         </div>
@@ -287,13 +287,13 @@
           <input id="fadeOut3" type="number" min='0' max='30' value='0.0' step="0.1">
         </div>
         <div class="fade-label column">
-          <img type="image" src="./fadeOut.png"width="10px" height="15px" role="switch"></img>
-        </div> 
+          <img type="image" src="./img/fadeOut.png"width="10px" height="15px" role="switch"></img>
+        </div>
       </div> <!-- fade controls -->
 
     </div>
     <div class="track column resizable moveable" id="track3">
-      <p>Ambi_Mix_04.mp3</p>
+      <p>DTNN_SFX BUS.mp3</p>
       <div class="trackLabel row resizers" id="trackLabel3">
         <div class="waveform"></div>
         <div class='resizer side-left'></div>
@@ -304,21 +304,79 @@
   </div>
 
 </div>
+
+<div class="row" id="row4">
+  <div class="header column" id="header4">
+    <div class="label" id="label4">
+      <h4>Studio</h4>
+    </div>
+
+          <div class="row volume-controls">
+      <div class="volume-label column">
+        <img src="./img/mutedButton.png"width="15px" height="15px"></img>
+      </div>
+      <div class="volume-slider column">
+        <input id="gain4" type="range" min="0" max="1" value=".5" step="0.01">
+      </div>
+      <div class="volume-label column">
+        <img type="image" src="./img/unmutedButton.png"width="15px" height="15px" role="switch"></img>
+      </div>
+    </div> <!-- volume controls -->
+
+    <div class="row pan-controls">
+      <div class="pan-label column">L</div>
+      <div class="pan-slider column">
+        <input id="pan3" type="range" min="-4" max="4" value="0" step="0.01">
+      </div>
+      <div class="pan-label column">R</div>
+    </div> <!-- pan controls -->
+
+    <div class="fade-controls row">
+      <div class="fade-label column">
+        <img type="image" src="./img/fadeIn.png"width="10px" height="15px" role="switch"></img>
+      </div>
+       <div class="fade-input column">
+        <input id="fadeIn3" type="number" min='0' max='30' value='0.0' step="0.1">
+      </div>
+      <div class="fade-input column">
+        <input id="fadeOut3" type="number" min='0' max='30' value='0.0' step="0.1">
+      </div>
+      <div class="fade-label column">
+        <img type="image" src="./img/fadeOut.png"width="10px" height="15px" role="switch"></img>
+      </div>
+    </div> <!-- fade controls -->
+
+  </div>
+  <div class="track column resizable moveable" id="track4">
+    <p>DTNN_STUDIO BUS.mp3</p>
+    <div class="trackLabel row resizers" id="trackLabel4">
+      <div class="waveform"></div>
+      <div class='resizer side-left'></div>
+      <div class='resizer side-right'></div>
+      <div class='resizer bottom-left'></div>
+      <div class='resizer bottom-right'></div></div>
+  </div>
+</div>
+
+</div>
+
+
+
 <div class="row legend" id="legend">
   <div class="column tutorial" id="legend-transport">
     <div class="row legend-header">
       Playback Controls
     </div>
     <div class="row">
-      <img id="legend-return" src="./returnButton.png"></img>
+      <img id="legend-return" src="./img/returnButton.png"></img>
         <label class="legend-label" for="legend-return">Return to start</label>
     </div>
     <div class="row">
-      <img class="row" id="legend-pause" src="./pauseButton.png"</img>
+      <img class="row" id="legend-pause" src="./img/pauseButton.png"</img>
       <label class="legend-label" for="legend-pause">Pause playback</label>
     </div>
     <div class="row">
-      <img class="row" id="legend-play" src="./playButton.png"</img>
+      <img class="row" id="legend-play" src="./img/playButton.png"</img>
         <label class="legend-label" for="legend-play">Begin playback</label>
     </div>
   </div>
@@ -327,16 +385,16 @@
       Track Controls
     </div>
     <div class="row">
-      <img id="legend-volume" src="./unmutedButton.png"></img>
+      <img id="legend-volume" src="./img/unmutedButton.png"></img>
         <label class="legend-label" for="legend-volume">Track volume</label>
     </div>
     <div class="row">
-      <img class="row" id="legend-pan" src="./lr.png"></img>
+      <img class="row" id="legend-pan" src="./img/lr.png"></img>
       <label class="legend-label" for="legend-pan">Pan audio left/right</label>
     </div>
     <div class="row">
-      <img class="row" id="legend-fadeIn" src="./fadeIn.png"</img>
-      <img class="row" id="legend-fadeOut" src="./fadeOut.png"</img>
+      <img class="row" id="legend-fadeIn" src="./img/fadeIn.png"</img>
+      <img class="row" id="legend-fadeOut" src="./img/fadeOut.png"</img>
         <label class="legend-label" for="legend-fadeOut">Fade In/Out Time</label>
     </div>
   </div>
@@ -345,23 +403,23 @@
       Audio Clip Controls
     </div>
     <div class="row" id="legend-resizer">
-      <img class="row" id="legend-trim" src="./resizer.png"></img>
+      <img class="row" id="legend-trim" src="./img/resizer.png"></img>
         <label class="legend-label" for="legend-return">Trim clip start/end</label>
     </div>
     <div class="row">
-      <img class="row" id="legend-pause" src="./grab.png"</img>
+      <img class="row" id="legend-pause" src="./img/grab.png"</img>
       <label class="legend-label" for="legend-pause">Drag to move clip</label>
     </div>
     <div class="row">
-      <img class="row" id="legend-play" src="./waveformIcon.png"</img>
+      <img class="row" id="legend-play" src="./img/waveformIcon.png"</img>
         <label class="legend-label" for="legend-play">Audio waveform</label>
     </div>
   </div>
 <!--   <div class="column tutorial" id="legend-tracks">
-    <img type="image" src="./fadeIn.png"width="10px" height="15px" role="switch"></img>
-    <img type="image" src="./fadeOut.png"</img>
-    <img type="image" src="./mutedButton.png"></img>
-    <img type="image" src="./unmutedButton.png"></img>
+    <img type="image" src="./img/fadeIn.png"width="10px" height="15px" role="switch"></img>
+    <img type="image" src="./img/fadeOut.png"</img>
+    <img type="image" src="./img/mutedButton.png"></img>
+    <img type="image" src="./img/unmutedButton.png"></img>
     <div class="resizer" id="legend-resizer"></div>
   </div> -->
 </div>
