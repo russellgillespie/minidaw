@@ -975,7 +975,7 @@ function makeResizableDiv(div) {
           else if (mouseX >= min_left)
           {
             newTrim = (startTrim + masterDuration * ((mouseX - originalTrim) / maximum_size)).toFixed(4);
-            //clamp trim to duration range 0-90
+            //clamp trim to master duration range
             if (newTrim > masterDuration)
             {
               newTrim = masterDuration;
@@ -993,7 +993,10 @@ function makeResizableDiv(div) {
               //console.log("left: " + left);
               element.dataset.playheadOffset = parseFloat(((mouseX - min_left) / maximum_size) * masterDuration);
               element.style.width = width + 'px';
-              element.querySelector(".waveform").style.backgroundPosition = -4.8 * newTrim + "px, 50%";
+              // element.querySelector(".waveform").style.backgroundPosition = -4.8 * newTrim + "px, 50%";
+              var bgPos = element.dataset.startTrim;
+              console.log(bgPos);
+              element.querySelector(".waveform").style.backgroundPosition = -bgPos*1.224 + "px, 50%";
               //console.log(newTrim.toFixed(2) + "px, 0px");
             }
 
