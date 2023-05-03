@@ -330,6 +330,7 @@ h4 {
   width: 30px;
   background-color: #1e3445;
   border: .5px solid black;
+  font-size: 10px;
 }
 
 /* Styling Range Sliders (From https://css-tricks.com/styling-cross-browser-compatible-range-inputs-css/)   */

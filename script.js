@@ -63,6 +63,7 @@ var urls = [
 var gainNodeAll;
 var panNodeAll;
 var playheadSliderJustClicked = 'false';
+var loaded = false;
 
 
 function init() {
@@ -75,7 +76,6 @@ function init() {
   bufferLoader = new BufferLoader(ctx, urls, finishedLoading);
   bufferLoader.load();
   initRouting();
-
   unlockAudioContext(ctx);
 
   for (var i=0; i < urls.length; i++) {
@@ -97,6 +97,7 @@ function finishedLoading(bufferList) {
   //sources[_index].start(0);
   });
   //addListenersToArrayElements(sources, durations, 'loadeddata');
+  loaded = true;
 }
 
 //////REFACTOR//////
@@ -660,59 +661,63 @@ function PauseTrack(_index) {
 
 function PlayAllTracks() {
   console.log("PlayAllTracks function running");
-  if (playAll.dataset.playing == "false") {
-    // playTrackButtons.forEach(function(_button, _index, _buttons){
-    urls.forEach(function(_button, _index, _buttons){
-      // if (_button.dataset.playing === 'true') {
-      if (playAll.dataset.playing === 'true') {
-        PauseTrack(_index);
-      }
-    })
-    // playheadStartTime = playheadOffset.valueAsNumber; //Commented for Master
-    playheadStartTime = playheadSlider.valueAsNumber;
-    urls.forEach(function(_url, _index, _urls) {
-      PlayTrack(_index, playheadTime);
-    })
+  if (loaded) {
+    if (playAll.dataset.playing == "false") {
+      // playTrackButtons.forEach(function(_button, _index, _buttons){
+      urls.forEach(function(_button, _index, _buttons){
+        // if (_button.dataset.playing === 'true') {
+        if (playAll.dataset.playing === 'true') {
+          PauseTrack(_index);
+        }
+      })
+      // playheadStartTime = playheadOffset.valueAsNumber; //Commented for Master
+      playheadStartTime = playheadSlider.valueAsNumber;
+      urls.forEach(function(_url, _index, _urls) {
+        PlayTrack(_index, playheadTime);
+      })
 
-    //Schedule Master Fade In
-    if (fadeInAll.value > 0)
-    {
-      try
+      //Schedule Master Fade In
+      if (fadeInAll.value > 0)
       {
-        gainNodeAll.gain.linearRampToValueAtTime(0, ctx.currentTime);
-        //console.log("resetGain: " + gainNodeAll.gain.value);
-        //console.log("fadeAll target Time: " + (ctx.currentTime - playheadStartTime + parseFloat(fadeInAll.value)));
-        gainNodeAll.gain.linearRampToValueAtTime(volumeControlAll.value, ctx.currentTime - playheadStartTime + parseFloat(fadeInAll.value), 0.8);
+        try
+        {
+          gainNodeAll.gain.linearRampToValueAtTime(0, ctx.currentTime);
+          //console.log("resetGain: " + gainNodeAll.gain.value);
+          //console.log("fadeAll target Time: " + (ctx.currentTime - playheadStartTime + parseFloat(fadeInAll.value)));
+          gainNodeAll.gain.linearRampToValueAtTime(volumeControlAll.value, ctx.currentTime - playheadStartTime + parseFloat(fadeInAll.value), 0.8);
+        }
+        catch(error)
+        {
+          console.log("master fade in: " + error);
+          gainNodeAll.gain.setValueAtTime(volumeControlAll.value, ctx.currentTime);
+         }
       }
-      catch(error)
-      {
-        console.log("master fade in: " + error);
-        gainNodeAll.gain.setValueAtTime(volumeControlAll.value, ctx.currentTime);
-       }
+
+      //Schedule MasterFade out
+      if (fadeOutAll.value > 0){
+        try
+        {
+          gainNodeAll.gain.linearRampToValueAtTime(0, masterDuration - playheadStartTime - parseFloat(fadeOutAll.value), 0.8);
+
+        }
+        catch(error)
+        {
+          console.log("master fade out: " + error)
+          gainNodeAll.gain.linearRampToValueAtTime(0, masterDuration - playheadStartTime - parseFloat(fadeOutAll.value), 0.8);
+        }
+      }
+
+
+      playAll.dataset.playing = 'true';
+      playheadRunning = 'true';
+      startTime = ctx.currentTime;
+      UpdatePlayheadTime(playheadElement, timerIncrement, buttons);
     }
-
-    //Schedule MasterFade out
-    if (fadeOutAll.value > 0){
-      try
-      {
-        gainNodeAll.gain.linearRampToValueAtTime(0, masterDuration - playheadStartTime - parseFloat(fadeOutAll.value), 0.8);
-
-      }
-      catch(error)
-      {
-        console.log("master fade out: " + error)
-        gainNodeAll.gain.linearRampToValueAtTime(0, masterDuration - playheadStartTime - parseFloat(fadeOutAll.value), 0.8);
-      }
+    else {
+      console.log("Audio is already playing");
     }
-
-
-    playAll.dataset.playing = 'true';
-    playheadRunning = 'true';
-    startTime = ctx.currentTime;
-    UpdatePlayheadTime(playheadElement, timerIncrement, buttons);
-  }
-  else {
-    console.log("Audio is already playing");
+  } else {
+    alert("Audio files still loading. Please wait.");
   }
 }
 
