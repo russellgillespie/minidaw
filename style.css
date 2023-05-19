@@ -5,8 +5,10 @@
   width : 540px;
   height : 100%;
   background-color : #012;
-/*   border-style : solid; */
-  border-color : #012;
+  border-style : solid;
+  border-color : #ccc;
+  border-radius: 5px;
+  border-width: 20px;
 }
 
 h1 {
@@ -56,6 +58,7 @@ h4 {
   border: 0px 0px 0px 1px solid black;
   box-shadow: inset 0px 0px 0px 1px black;
   box-sizing: border-box; /* Include padding and border in element's width and height */
+  font-size : 14px;
 }
 
 .track {
@@ -69,7 +72,7 @@ h4 {
 }
 
 #trackMaster {
-  width : 426px;
+  width : 432px;
   height : 120px;
   background-color : #223b4f;
   border: 0px 0px 0px 1px solid black;
@@ -116,7 +119,7 @@ h4 {
 
 .trackLabel {
   height : 65px;
-  margin : 3px;
+  /* margin : 3px; */
   margin-top : 22px;
   background-color : #f9f9f9;
 }
