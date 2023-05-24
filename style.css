@@ -97,7 +97,7 @@ h4 {
   margin-top : 0px;
   height : 40px;
   width : 100%;
-  background-image: url("./img/timelineBG.png");
+  background-image: url("img/timelineBG.png");
   background-color: white;
   background-position: center;
 
@@ -137,24 +137,24 @@ h4 {
 }
 
 #trackLabel0 .waveform {
-    background-image: url("./img/DTNN_AMBI BUS.png");
+    background-image: url("img/DTNN_AMBI-BUS.png");
 }
 
 #trackLabel1 .waveform {
-    background-image: url("./img/DTNN_INTERVIEW BUS.png");
+    background-image: url("img/DTNN_INTERVIEW-BUS.png");
 }
 
 #trackLabel2 .waveform {
     background-image:
-  url("./img/DTNN_MUSIC BUS.png");
+  url("img/DTNN_MUSIC-BUS.png");
 }
 
 #trackLabel3 .waveform {
-    background-image: url("./img/DTNN_SFX BUS.png");
+    background-image: url("img/DTNN_SFX-BUS.png");
 }
 
 #trackLabel4 .waveform {
-    background-image: url("./img/DTNN_STUDIO BUS.png");
+    background-image: url("img/DTNN_STUDIO-BUS.png");
 }
 
 #track0, #trackLabel0 .resizer {
@@ -221,7 +221,7 @@ h4 {
   left: 0px;
   bottom: 0px;
   cursor: ew-resize;
-  background-image: url("./img/resizeThumb.png");
+  background-image: url("img/resizeThumb.png");
   background-repeat: no-repeat;
   background-position: center;
   background-size: 5px 8px;
@@ -231,7 +231,7 @@ h4 {
   right: 0px;
   bottom: 0px;
   cursor: ew-resize;
-  background-image: url("./img/resizeThumb.png");
+  background-image: url("img/resizeThumb.png");
   background-repeat: no-repeat;
   background-position: center;
   background-size: 5px 8px;
