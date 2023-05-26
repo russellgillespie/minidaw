@@ -5,10 +5,10 @@
   width : 540px;
   height : 100%;
   background-color : #012;
-  border-style : solid;
+  /* border-style : solid;
   border-color : #ccc;
   border-radius: 5px;
-  border-width: 20px;
+  border-width: 20px; */
 }
 
 h1 {
