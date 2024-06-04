@@ -77,7 +77,8 @@ playheadSlider.addEventListener('input', function() {
 const returnAll = document.querySelector('#returnAll');
 const pauseAll = document.querySelector('#pauseAll');
 const playAll = document.querySelector('#playAll');
-playAll.dataset.playing = false;
+playAll.dataset.playing = 'false';
+playAll.dataset.volumeChanging = 'false';
 
 const masterDuration = 353;
 
@@ -174,7 +175,7 @@ returnAll.addEventListener('touchstart', (event) => {
 volumeControlAll.addEventListener('input', function() {
   gainNodeAll.gain.linearRampToValueAtTime(this.value**1 * gainScale, ctx.currentTime + 0.001);
   playAll.dataset.baseGain = this.value;
-  console.log("VCA baseGain: " + playAll.dataset.baseGain);
+  // console.log("VCA baseGain: " + playAll.dataset.baseGain);
   masterGainAutomationCurve = fadeInAllAutomationHandler(masterGainAutomationCurve, fadeInAll.value, fadeOutAll.value, playAll.dataset.baseGain);
 }, false);
 
@@ -442,10 +443,8 @@ function playAllTracks() {
         playTrack(_index, playheadTime);
       });
 
-      console.log(ctx.currentTime);
-      console.log(playheadStartTime);
-
-
+      // console.log(ctx.currentTime);
+      // console.log(playheadStartTime);
 
       // Populate automation curve for master track gain
       let automationOffset = Math.ceil(playheadStartTime);
@@ -454,7 +453,7 @@ function playAllTracks() {
       gainNodeAll.gain = masterGainAutomationCurve[automationOffset]**1 * gainScale;
 
       masterGainAutomationCurve = fadeInAllAutomationHandler(masterGainAutomationCurve, fadeInAll.value, fadeOutAll.value, playAll.dataset.baseGain);
-      console.log(masterGainAutomationCurve);
+      // console.log(masterGainAutomationCurve);
       // console.log(automationBuffer);
 
       // Schedule all automation for master gain
@@ -706,7 +705,7 @@ function makeResizableDiv(div) {
       e.stopPropagation();
 
       originalWidth = parseFloat(getComputedStyle(element, null).getPropertyValue('width').replace('px', ''));
-      if ( logLevel === "debug" ) console.log("originalWidth: " + originalWidth);
+      // if ( logLevel === "debug" ) console.log("originalWidth: " + originalWidth);
 
       originalXLeft = element.getBoundingClientRect().left;
       originalXRight = element.getBoundingClientRect().right;
@@ -716,7 +715,7 @@ function makeResizableDiv(div) {
       mouseOffsetRight = originalXRight - originalMouseX; // get distance between mouse click and resizer's outer edge
       mouseOffsetLeft = originalMouseX - originalXLeft;
 
-      if ( logLevel === "debug" ) console.log("mouseOffsetLeft: " + mouseOffsetLeft + ", mouseOffsetRight: " + mouseOffsetRight);
+      // if ( logLevel === "debug" ) console.log("mouseOffsetLeft: " + mouseOffsetLeft + ", mouseOffsetRight: " + mouseOffsetRight);
       //console.log("Total: " + (mouseOffsetLeft + mouseOffsetRight));
       window.addEventListener('mousemove', resize);
       window.addEventListener('mouseup', stopResize);
@@ -738,7 +737,7 @@ function makeResizableDiv(div) {
         }
         // Get current clip's trimmed duration in seconds
         let startTrim = parseFloat(element.dataset.endTrim); // 90
-        console.log("startTrim: " + startTrim);
+        // console.log("startTrim: " + startTrim);
         let newTrim = 0.0; // initialize new trim variable
 
         // get current mouse X position
@@ -748,7 +747,7 @@ function makeResizableDiv(div) {
         if (mouseX > maxRight) {
           mouseX = maxRight;
         }
-        if ( logLevel === "debug" ) console.log("mouseX: " + mouseX);
+        // if ( logLevel === "debug" ) console.log("mouseX: " + mouseX);
         originalMouseX = originalXRight;
         // if ( logLevel === "debug" ) console.log("ogMouseX: " + originalMouseX);
         // Calculate new width of div
@@ -757,7 +756,7 @@ function makeResizableDiv(div) {
         // Check if width is in bounds
         if (width < minimumSize){ width = minimumSize };
         if (width > maximumSize){ width = maximumSize };
-        if ( logLevel === "debug" ) console.log("width: " + width);
+        // if ( logLevel === "debug" ) console.log("width: " + width);
         //if (width >= minimumSize && width <= maximumSize) {
 
           // Trim duration if not exceeding max time
@@ -774,7 +773,7 @@ function makeResizableDiv(div) {
           // console.log("originalTrim: " + originalTrim);
           // console.log("mouseX: " + mouseX);
           // console.log("maximumSize: " + maximumSize);
-          console.log("newTrim: " + newTrim);
+          // console.log("newTrim: " + newTrim);
 
           // console.log("newTrim: " + newTrim);
           // If trim is in bounds apply resize transformation
@@ -786,7 +785,7 @@ function makeResizableDiv(div) {
           if (newTrim <= 1 ) { newTrim = 0 };
           element.style.width = width + 'px';
           element.style.right = originalXLeft + width + 'px';
-          console.log("newTrim: " + newTrim);
+          // console.log("newTrim: " + newTrim);
 
           // Color resizers red if at end of audio clip length
           if (masterDuration - newTrim <= 0) {
@@ -811,13 +810,13 @@ function makeResizableDiv(div) {
       else if (currentResizer.classList.contains('bottom-left') || currentResizer.classList.contains('side-left')) {
         // Get right edge position in pixels and parse
         let originalTrim = parseFloat(element.getBoundingClientRect().left);
-        if ( logLevel === "debug" ) console.log("originalTrim: " + originalTrim);
+        // if ( logLevel === "debug" ) console.log("originalTrim: " + originalTrim);
         if (originalTrim === '' || Number.isNaN(originalTrim)) {
           originalTrim = parseFloat(minLeft); // 116
         }
         // if ( logLevel === "debug" ) console.log("originalTrim: " + originalTrim);
         let startTrim = parseFloat(element.dataset.startTrim);
-        if ( logLevel === "debug" ) console.log("st: " + startTrim); //0
+        // if ( logLevel === "debug" ) console.log("st: " + startTrim); //0
         let newTrim = 0.0;
 
         // get current mouse X position
@@ -827,7 +826,7 @@ function makeResizableDiv(div) {
         if (mouseX <= minLeft) {
           mouseX = minLeft;
         }
-        if ( logLevel === "debug" ) console.log("mouseX: " + mouseX);
+        // if ( logLevel === "debug" ) console.log("mouseX: " + mouseX);
 
 
         // calculate current resizable element width
@@ -836,7 +835,7 @@ function makeResizableDiv(div) {
         // Check if width is in bounds
         if (width < minimumSize){ width = minimumSize };
         if (width > maximumSize){ width = maximumSize };
-        if ( logLevel === "debug" ) console.log("width: " + width);
+        // if ( logLevel === "debug" ) console.log("width: " + width);
         // if (width >= minimumSize && width <= maximumSize) {
           // Check if mouse is left of border
           if (mouseX < minLeft) {
@@ -896,7 +895,7 @@ function makeResizableDiv(div) {
         _resizer.style.backgroundColor = originalColor;
       });
       window.removeEventListener('mousemove', resize);
-      console.log(element.dataset);
+      // console.log(element.dataset);
       if (playAll.dataset.playing === 'true') {
         pauseAllTracks();
         playAllTracks();
