@@ -172,7 +172,7 @@ returnAll.addEventListener('touchstart', (event) => {
 // /Add event listeners for gain and pan changes
 // Gain Sliders
 volumeControlAll.addEventListener('input', function() {
-  gainNodeAll.gain.linearRampToValueAtTime(this.value * this.value * gainScale, ctx.currentTime + 0.001);
+  gainNodeAll.gain.linearRampToValueAtTime(this.value**2 * gainScale, ctx.currentTime + 0.001);
   playAll.dataset.baseGain = this.value;
   console.log("VCA baseGain: " + playAll.dataset.baseGain);
   masterGainAutomationCurve = fadeInAllAutomationHandler(masterGainAutomationCurve, fadeInAll.value, fadeOutAll.value, playAll.dataset.baseGain);
@@ -437,7 +437,7 @@ function playAllTracks() {
       let automationOffset = Math.ceil(playheadStartTime);
 
       gainNodeAll.gain.cancelScheduledValues(ctx.currentTime)
-      gainNodeAll.gain = masterGainAutomationCurve[automationOffset] * gainScale;
+      gainNodeAll.gain = masterGainAutomationCurve[automationOffset]**2 * gainScale;
 
       masterGainAutomationCurve = fadeInAllAutomationHandler(masterGainAutomationCurve, fadeInAll.value, fadeOutAll.value, playAll.dataset.baseGain);
       console.log(masterGainAutomationCurve);
@@ -448,7 +448,7 @@ function playAllTracks() {
 
         //console.log("i + pst: " + i + " : " + playheadStartTime);
 
-        gainNodeAll.gain = masterGainAutomationCurve[automationOffset] * gainScale;
+        gainNodeAll.gain = masterGainAutomationCurve[automationOffset]**2 * gainScale;
         //console.log("automationOffset: " + automationOffset);
         // if (i == 353) {
         //   gainNodeAll.gain.cancelScheduledValues(ctx.currentTime);
@@ -456,7 +456,7 @@ function playAllTracks() {
         // } else
         if (i == automationOffset ) {
           gainNodeAll.gain.cancelScheduledValues(ctx.currentTime);
-          gainNodeAll.gain.setValueAtTime(masterGainAutomationCurve[i] * gainScale, ctx.currentTime);
+          gainNodeAll.gain.setValueAtTime(masterGainAutomationCurve[i]**2 * gainScale, ctx.currentTime);
         } else if (i > automationOffset ) {
           gainNodeAll.gain.linearRampToValueAtTime(masterGainAutomationCurve[i]**2 * gainScale, ctx.currentTime + i - automationOffset);
         } else if (i <= automationOffset) {
@@ -537,14 +537,18 @@ function playAllTracks() {
 
 function pauseAllTracks() {
   urls.forEach(function(_url, _index, _urls) {
-    sources[_index].stop();
+    try {
+      sources[_index].stop();
+    } catch (error) {
+      console.log("Audio has not started playback yet.");
+    }
     // if ( logLevel === "debug" ) console.log(gainNodes[_index]);
     gainNodes[_index].gain.cancelScheduledValues(ctx.currentTime);
     // if ( logLevel === "debug" ) console.log(volumeControls[_index].value)
     gainNodes[_index].gain.setValueAtTime(volumeControls[_index].value, ctx.currentTime);
   });
   gainNodeAll.gain.cancelScheduledValues(ctx.currentTime);
-  gainNodeAll.gain.setValueAtTime(volumeControlAll.value * gainScale, ctx.currentTime);
+  gainNodeAll.gain.setValueAtTime(volumeControlAll.value**2 * gainScale, ctx.currentTime);
   if (playAll.dataset.playing == 'true') {
     playAll.dataset.playing = 'false';
     playheadRunning = 'false';
@@ -874,7 +878,7 @@ function makeResizableDiv(div) {
       });
       window.removeEventListener('mousemove', resize);
       console.log(element.dataset);
-      if (playAll.dataset.playing) {
+      if (playAll.dataset.playing === 'true') {
         pauseAllTracks();
         playAllTracks();
       }
