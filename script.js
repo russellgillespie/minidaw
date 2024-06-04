@@ -1,6 +1,6 @@
 // Web Audio Code
 
-const logLevel = 'info'; // debug // info // none //
+const logLevel = 'debug'; // debug // info // none //
 
 let ctx;
 
@@ -22,6 +22,12 @@ const fadeOuts = [];
 
 let gainNodeAll;
 let panNodeAll;
+let masterGainAutomationCurve = new Float32Array(353);
+masterGainAutomationCurve.forEach((item, i) =>{
+  //console.log(item);
+  masterGainAutomationCurve[i] = 0.5;
+});
+//console.log(masterGainAutomationCurve);
 
 // Production urls
 const urls = [
@@ -31,6 +37,8 @@ const urls = [
   './audio/DTNN_SFX BUS.mp3',
   './audio/DTNN_STUDIO BUS.mp3',
 ];
+
+
 
 // Global States
 // let playheadSliderJustClicked = 'false';
@@ -55,6 +63,7 @@ playheadSlider.addEventListener('input', function() {
   playheadTime = this.value;
   playheadElement.innerHTML = formatTime(this.value * 1000);
   if (playAll.dataset.playing === 'true') {
+    volumeControlAll.gain = masterGainAutomationCurve[Math.ceil(playheadTime)];
     pauseAllTracks();
     playAllTracks();
   }
@@ -164,6 +173,9 @@ returnAll.addEventListener('touchstart', (event) => {
 // Gain Sliders
 volumeControlAll.addEventListener('input', function() {
   gainNodeAll.gain.linearRampToValueAtTime(this.value * this.value * gainScale, ctx.currentTime + 0.001);
+  playAll.dataset.baseGain = this.value;
+  console.log("VCA baseGain: " + playAll.dataset.baseGain);
+  masterGainAutomationCurve = fadeInAllAutomationHandler(masterGainAutomationCurve, fadeInAll.value, fadeOutAll.value, playAll.dataset.baseGain);
 }, false);
 
 panControlAll.addEventListener('input', function() {
@@ -200,10 +212,10 @@ function init() {
   for (let i = 0; i < urls.length; i++) {
     const currentTrack = document.querySelector('#track' + i);
     if (currentTrack.dataset.playheadOffset === undefined) {
-      currentTrack.dataset.playheadOffset = 0;
+      currentTrack.dataset.playheadOffset = 0.0;
     };
     if (currentTrack.dataset.startTrim === undefined) {
-      currentTrack.dataset.startTrim = 0;
+      currentTrack.dataset.startTrim = 0.0;
     };
     if (currentTrack.dataset.endTrim === undefined) {
       currentTrack.dataset.endTrim = masterDuration;
@@ -248,6 +260,7 @@ function updatePlayheadTime(_displayElement, _increment, _buttons) {
           playheadTime = (ctx.currentTime - startTime + playheadStartTime);
           _displayElement.innerHTML = formatTime(playheadTime * 1000);
           const newPlayheadTime = parseFloat(playheadTime.toFixed(3));
+
           if (playheadSliderJustClicked = 'false') {
             playheadSlider.value = newPlayheadTime;
           // playheadOffset.value = newPlayheadTime;
@@ -258,10 +271,17 @@ function updatePlayheadTime(_displayElement, _increment, _buttons) {
           if (playheadRunning === 'true') {
           // if ( logLevel === "debug" ) console.log('recursive call');
             updatePlayheadTime(_displayElement, _increment, _buttons);
+            if (playheadTime >= 353 ) {
+              pauseAllTracks();
+            }
           } else {
             playheadRunning = 'false';
           // if ( logLevel === "debug" ) console.log('inner playhead time: ' + playheadTime);
           }
+          masterGainAutomationCurve = fadeInAllAutomationHandler(masterGainAutomationCurve, fadeInAll.value, fadeOutAll.value, playAll.dataset.baseGain);
+          volumeControlAll.value = masterGainAutomationCurve[Math.ceil(playheadTime)]
+
+
         }, _increment);
   }
 }
@@ -326,10 +346,10 @@ function createSource(_index, _node) {
 function playTrack(_index, _playheadOffset) {
   resumeContext();
   createSource(_index, panNodes[_index]);
-  const currentTrack = document.querySelector('#track' + _index);
-  const trackOffset = parseFloat(currentTrack.dataset.playheadOffset);
+  let currentTrack = document.querySelector('#track' + _index);
+  let trackOffset = parseFloat(currentTrack.dataset.playheadOffset);
   let trackStartTrim = parseFloat(currentTrack.dataset.startTrim);
-  const trackEndTrim = parseFloat(currentTrack.dataset.endTrim);
+  let trackEndTrim = parseFloat(currentTrack.dataset.endTrim);
 
   let wh = ctx.currentTime + trackOffset - _playheadOffset;
   if (wh < 0) {
@@ -356,15 +376,17 @@ function playTrack(_index, _playheadOffset) {
   // if ( logLevel === "debug" ) console.log("when " + (wh));
   // if ( logLevel === "debug" ) console.log(gainNodes[_index].gain.setTargetAtTime);
 
+  // HANDLE FADES
   // if ( logLevel === "debug" ) console.log('FadeIn Index: ' + _index)
   if (fadeIns[_index].value > 0) {
     try {
       gainNodes[_index].gain.linearRampToValueAtTime(0, ctx.currentTime);
       // if ( logLevel === "debug" ) console.log("resetGain: " + gainNodes[_index].gain.value);
-      gainNodes[_index].gain.linearRampToValueAtTime(volumeControls[_index].value, wh + parseFloat(fadeIns[_index].value), 0.8);
+      gainNodes[_index].gain.linearRampToValueAtTime(volumeControls[_index].value * gainScale, wh + parseFloat(fadeIns[_index].value), 0.8);
     } catch (error) {
       // if ( logLevel === "debug" ) console.log('track_' + [_index] + 'fade in: ' + error)
-      gainNodes[_index].gain.setValueAtTime(volumeControls[_index].value, ctx.currentTime);
+      console.log(error);
+      gainNodes[_index].gain.setValueAtTime(volumeControls[_index].value * gainScale, ctx.currentTime);
     }
   }
 
@@ -374,8 +396,9 @@ function playTrack(_index, _playheadOffset) {
     try {
       gainNodes[_index].gain.linearRampToValueAtTime(0.0, wh + dur - parseFloat(fadeOuts[_index].value), 0.8);
     } catch (error) {
+      console.log(error);
       // if ( logLevel === "debug" ) console.log('track_' + [_index] + 'fade out: ' + error)
-      gainNodes[_index].gain.setValueAtTime(volumeControls[_index].value, ctx.currentTime);
+      gainNodes[_index].gain.setValueAtTime(volumeControls[_index].value * gainScale, ctx.currentTime);
     }
   }
 }
@@ -398,33 +421,107 @@ function playAllTracks() {
           pauseTrack(_index);
         }
       });
+
       playheadStartTime = playheadSlider.valueAsNumber;
+
       urls.forEach(function(_url, _index, _urls) {
         playTrack(_index, playheadTime);
       });
 
-      // Schedule Master Fade In
-      if (fadeInAll.value > 0) {
-        try {
-          gainNodeAll.gain.linearRampToValueAtTime(0, ctx.currentTime);
-          // if ( logLevel === "debug" ) console.log("resetGain: " + gainNodeAll.gain.value);
-          // if ( logLevel === "debug" ) console.log("fadeAll target Time: " + (ctx.currentTime - playheadStartTime + parseFloat(fadeInAll.value)));
-          gainNodeAll.gain.linearRampToValueAtTime(volumeControlAll.value, ctx.currentTime - playheadStartTime + parseFloat(fadeInAll.value), 0.8);
-        } catch (error) {
-          // if ( logLevel === "debug" ) console.log('master fade in: ' + error)
-          gainNodeAll.gain.setValueAtTime(volumeControlAll.value, ctx.currentTime);
-        }
-      }
+      console.log(ctx.currentTime);
+      console.log(playheadStartTime);
 
-      // Schedule MasterFade out
-      if (fadeOutAll.value > 0) {
-        try {
-          gainNodeAll.gain.linearRampToValueAtTime(0, masterDuration - playheadStartTime - parseFloat(fadeOutAll.value), 0.8);
-        } catch (error) {
-          // if ( logLevel === "debug" ) console.log('master fade out: ' + error)
-          gainNodeAll.gain.linearRampToValueAtTime(0, masterDuration - playheadStartTime - parseFloat(fadeOutAll.value), 0.8);
+
+
+      // Populate automation curve for master track gain
+      let automationOffset = Math.ceil(playheadStartTime);
+
+      gainNodeAll.gain.cancelScheduledValues(ctx.currentTime)
+      gainNodeAll.gain = masterGainAutomationCurve[automationOffset] * gainScale;
+
+      masterGainAutomationCurve = fadeInAllAutomationHandler(masterGainAutomationCurve, fadeInAll.value, fadeOutAll.value, playAll.dataset.baseGain);
+      console.log(masterGainAutomationCurve);
+      // console.log(automationBuffer);
+
+      // Schedule all automation for master gain
+      masterGainAutomationCurve.forEach((item, i) => {
+
+        //console.log("i + pst: " + i + " : " + playheadStartTime);
+
+        gainNodeAll.gain = masterGainAutomationCurve[automationOffset] * gainScale;
+        //console.log("automationOffset: " + automationOffset);
+        // if (i == 353) {
+        //   gainNodeAll.gain.cancelScheduledValues(ctx.currentTime);
+        //   gainNodeAll.gain = playAll.dataset.baseGain;
+        // } else
+        if (i == automationOffset ) {
+          gainNodeAll.gain.cancelScheduledValues(ctx.currentTime);
+          gainNodeAll.gain.setValueAtTime(masterGainAutomationCurve[i] * gainScale, ctx.currentTime);
+        } else if (i > automationOffset ) {
+          gainNodeAll.gain.linearRampToValueAtTime(masterGainAutomationCurve[i]**2 * gainScale, ctx.currentTime + i - automationOffset);
+        } else if (i <= automationOffset) {
+          //console.log("Skipping automation for past node: " + i + " : " + masterGainAutomationCurve[i] * gainScale);
+        } else {
+          // Handle errors
+          //console.log("Unexpected array index state.");
         }
-      }
+
+      });
+
+
+      // if (playheadStartTime >= fadeInAll.value) {
+      //   console.log("Playhead Start is after fadeIn.")
+      //   gainNodeAll.gain.value = volumeControlAll.value;
+      // } else {
+      //   console.log("Playhead Start is before fadeIn. Attempting fadeIn.")
+      //   //gainNodeAll.gain.value = 0;
+      //   let interruptGain = volumeControlAll.value * playheadStartTime / fadeInAll.value;
+      //   gainNodeAll.gain.setValueAtTime(interruptGain, ctx.currentTime);
+      //   volumeControlAll.value = gainNodeAll.gain.value;
+      //   console.log("interruptGain: " + interruptGain);
+      //   //gainNodeAll.gain.linearRampToValueAtTime(volumeControlAll.value, ctx.currentTime + fadeInAll.value - playheadStartTime);
+      //   console.log(gainNodeAll.gain.value);
+      // }
+
+      //gainNodeAll.gain.linearRampToValueAtTime(volumeControlAll.value, ctx.currentTime - playheadStartTime + parseFloat(fadeInAll.value));
+
+      // gainNodeAll.gain.linearRampToValueAtTime(volumeControlAll.value, ctx.currentTime + masterDuration - playheadStartTime - parseFloat(fadeOutAll.value));
+      // gainNodeAll.gain.linearRampToValueAtTime(0, ctx.currentTime - playheadStartTime + masterDuration);
+
+      //gainNodeAll.gain.cancelScheduledValues(ctx.currentTime - playheadStartTime + masterDuration + 1);
+
+
+      //////////////REFACTOR MASTER FADES
+      // // Schedule Master Fade In
+      // if (fadeInAll.value > 0) {
+      //   try {
+      //     //gainNodeAll.gain.linearRampToValueAtTime(0, ctx.currentTime);
+      //     // if ( logLevel === "debug" ) console.log("resetGain: " + gainNodeAll.gain.value);
+      //     // if ( logLevel === "debug" ) console.log("fadeAll target Time: " + (ctx.currentTime - playheadStartTime + parseFloat(fadeInAll.value)));
+      //     gainNodeAll.gain.setvalueAtTime(0, ctx.currentTime);
+      //     gainNodeAll.gain.linearRampToValueAtTime(volumeControlAll.value, ctx.currentTime - playheadStartTime + parseFloat(fadeInAll.value), 0.8);
+      //   } catch (error) {
+      //     // if ( logLevel === "debug" ) console.log('master fade in: ' + error)
+      //     gainNodeAll.gain.setValueAtTime(volumeControlAll.value, ctx.currentTime);
+      //   }
+      // }
+      //
+      // // Schedule MasterFade out
+      // if (fadeOutAll.value > 0) {
+      //
+      //   try {
+      //     // gainNodeAll.gain.linearRampToValueAtTime(0, masterDuration - playheadStartTime - parseFloat(fadeOutAll.value), 0.8);
+      //     gainNodeAll.gain.cancelScheduledValues(ctx.currentTime);
+      //     gainNodeAll.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + masterDuration - playheadStartTime);
+      //     console.log("Tried Fade All Out");
+      //
+      //   } catch (error) {
+      //     console.log(error);
+      //     // if ( logLevel === "debug" ) console.log('master fade out: ' + error)
+      //     // gainNodeAll.gain.linearRampToValueAtTime(0, masterDuration - playheadStartTime - parseFloat(fadeOutAll.value), 0.8);
+      //   }
+      // }
+      //////////////REFACTOR MASTER FADES END
 
       playAll.dataset.playing = 'true';
       playheadRunning = 'true';
@@ -447,7 +544,7 @@ function pauseAllTracks() {
     gainNodes[_index].gain.setValueAtTime(volumeControls[_index].value, ctx.currentTime);
   });
   gainNodeAll.gain.cancelScheduledValues(ctx.currentTime);
-  gainNodeAll.gain.setValueAtTime(volumeControlAll.value, ctx.currentTime);
+  gainNodeAll.gain.setValueAtTime(volumeControlAll.value * gainScale, ctx.currentTime);
   if (playAll.dataset.playing == 'true') {
     playAll.dataset.playing = 'false';
     playheadRunning = 'false';
@@ -456,18 +553,42 @@ function pauseAllTracks() {
   }
 }
 
-// function cacheGainValues (_gainCache) {
-//   urls.forEach(function (_url, _index, _urls) {
-//     _gainCache.push(gainNodes[_index].gain.value)
-//   })
-//   return gainCache
-// }
+function cacheGainValues (_gainCache) {
+  urls.forEach(function (_url, _index, _urls) {
+    _gainCache.push(gainNodes[_index].gain.value)
+  })
+  return _gainCache
+}
 
-// function resetGainValues (_gainCache) {
-//   urls.forEach(function (_url, _index, _urls) {
-//     gainNode[_index].gain.setValueAtTime(_gainCache[_index], 0)
-//   })
-// }
+function resetGainValues (_gainCache) {
+  urls.forEach(function (_url, _index, _urls) {
+    gainNode[_index].gain.setValueAtTime(_gainCache[_index], 0)
+  })
+}
+
+function resetGainConrolValues (_gainCache) {
+  urls.forEach(function (_url, _index, _urls) {
+    gainNode[_index].gain.setValueAtTime(_gainCache[_index], )
+  })
+}
+
+function fadeInAllAutomationHandler (_automationArray, _fadeInTime, _fadeOutTime, _gain=0.5) {
+  // console.log("Populating automation array buffer")
+  _automationArray.forEach((item, i) => {
+    if (i < _fadeInTime && _fadeInTime > 0) {
+      _automationArray[i] = parseFloat(_gain * i  / fadeInAll.value).toFixed(2);
+      // console.log(_automationArray[i]);
+    } else if ( i > masterDuration - _fadeOutTime  && _fadeOutTime > 0){
+      _automationArray[i] = parseFloat(_gain * (masterDuration - i) / fadeOutAll.value).toFixed(2);
+      // console.log(_automationArray[i]);
+    } else {
+      _automationArray[i] = parseFloat(_gain).toFixed(2);
+      // console.log(_automationArray[i]);
+    }
+  });
+  // console.log(_automationArray);
+  return _automationArray;
+}
 
 function unlockAudioContext(ctx) {
   if (ctx.state !== 'suspended') return;
@@ -482,6 +603,7 @@ function unlockAudioContext(ctx) {
   }
 }
 
+// Function for managing moveable regions
 function makeMoveableDiv(div) {
   const offsetX = document.querySelector('.daw-wrapper').offsetLeft;
   const movers = document.querySelectorAll(div);
@@ -533,23 +655,23 @@ function makeMoveableDiv(div) {
   }
 }
 
+// Function for managing resizeable regions
 function makeResizableDiv(div) {
   const offsetX = document.querySelector('.daw-wrapper').offsetLeft;
   const element = document.querySelector(div);
   const resizers = document.querySelectorAll(div + ' .resizer');
+
   const minimumSize = 60;
   const maximumSize = 432;
   const minLeft = 108 + offsetX;
   const maxRight = 540 + offsetX;
   let originalWidth = 0;
-  // const originalHeight = 0
   let originalXLeft = 0;
-  // const originalY = 0
   let originalXRight = 0;
   let originalMouseX = 0;
-  // const originalMouseY = 0
   let mouseOffsetRight = 0;
   let mouseOffsetLeft = 0;
+
   let originalColor = '';
   const errorColor = '#bc1413';
 
@@ -559,45 +681,62 @@ function makeResizableDiv(div) {
     currentResizer.addEventListener('mousedown', function(e) {
       e.preventDefault();
       e.stopPropagation();
+
       originalWidth = parseFloat(getComputedStyle(element, null).getPropertyValue('width').replace('px', ''));
-      // if ( logLevel === "debug" ) console.log(originalWidth);
+      if ( logLevel === "debug" ) console.log("originalWidth: " + originalWidth);
+
       originalXLeft = element.getBoundingClientRect().left;
       originalXRight = element.getBoundingClientRect().right;
       // if ( logLevel === "debug" ) console.log(originalXLeft + ", " + originalXRight);
+
       originalMouseX = e.pageX;
       mouseOffsetRight = originalXRight - originalMouseX; // get distance between mouse click and resizer's outer edge
       mouseOffsetLeft = originalMouseX - originalXLeft;
-      // if ( logLevel === "debug" ) console.log("mouseOffsetLeft: " + mouseOffsetLeft + ", mouseOffsetRight: " + mouseOffsetRight);
+
+      if ( logLevel === "debug" ) console.log("mouseOffsetLeft: " + mouseOffsetLeft + ", mouseOffsetRight: " + mouseOffsetRight);
+      //console.log("Total: " + (mouseOffsetLeft + mouseOffsetRight));
       window.addEventListener('mousemove', resize);
       window.addEventListener('mouseup', stopResize);
     });
 
     function resize(e) {
       let mouseX = 0;
+      //console.log("mouseX: " + mouseX);
+      //console.log(element.dataset);
+
+
+      // HANDLE RIGHT RESIZER
       if (currentResizer.classList.contains('bottom-right') || currentResizer.classList.contains('side-right')) {
         // Get right edge position in pixels and parse
         let originalTrim = parseFloat(element.style.right); // 548 offsetX + minLeft + max_width
-        // if ( logLevel === "debug" ) console.log("originalTrim: " + originalTrim);
-
+        if ( logLevel === "debug" ) console.log("originalTrim: " + originalTrim);
         if (Number.isNaN(originalTrim)) {
-          originalTrim = maxRight; // 548
+          originalTrim = parseFloat(maxRight); // 548
         }
         // Get current clip's trimmed duration in seconds
         let startTrim = parseFloat(element.dataset.endTrim); // 90
+        console.log("startTrim: " + startTrim);
         let newTrim = 0.0; // initialize new trim variable
+
+        // get current mouse X position
         mouseX = e.pageX + mouseOffsetRight; // current click-drag position
+
         // Clamp mouse position input to right edge
         if (mouseX > maxRight) {
           mouseX = maxRight;
         }
+        if ( logLevel === "debug" ) console.log("mouseX: " + mouseX);
         originalMouseX = originalXRight;
         // if ( logLevel === "debug" ) console.log("ogMouseX: " + originalMouseX);
         // Calculate new width of div
-        const width = originalWidth - (originalXRight - mouseX);
-        // if ( logLevel === "debug" ) console.log("width: " + width);
+        let width = originalWidth - (originalXRight - mouseX);
 
-        // check that width is in bounds
-        if (width >= minimumSize && width <= maximumSize) {
+        // Check if width is in bounds
+        if (width < minimumSize){ width = minimumSize };
+        if (width > maximumSize){ width = maximumSize };
+        if ( logLevel === "debug" ) console.log("width: " + width);
+        //if (width >= minimumSize && width <= maximumSize) {
+
           // Trim duration if not exceeding max time
           if (startTrim <= 0) {
             startTrim = 0;
@@ -605,15 +744,29 @@ function makeResizableDiv(div) {
             startTrim = masterDuration;
           }
           // if ( logLevel === "debug" ) console.log("start trim: " + startTrim);
-          newTrim = parseFloat(startTrim - masterDuration * ((originalTrim - mouseX) / maximumSize));
+          newTrim = parseFloat(startTrim - (originalTrim - mouseX) * (masterDuration  / maximumSize));
 
+          // console.log("startTrim: " + startTrim);
+          // console.log("masterDuration: " + masterDuration);
+          // console.log("originalTrim: " + originalTrim);
+          // console.log("mouseX: " + mouseX);
+          // console.log("maximumSize: " + maximumSize);
+          console.log("newTrim: " + newTrim);
+
+          // console.log("newTrim: " + newTrim);
+          // If trim is in bounds apply resize transformation
           if (newTrim <= masterDuration && newTrim >= 0) {
             element.dataset.endTrim = newTrim;
-            element.style.width = width + 'px';
-            element.style.right = originalXLeft + width + 'px';
-          }
 
-          if (masterDuration - newTrim < 0.01) {
+          }
+          if (newTrim >= masterDuration - 1) { newTrim = masterDuration };
+          if (newTrim <= 1 ) { newTrim = 0 };
+          element.style.width = width + 'px';
+          element.style.right = originalXLeft + width + 'px';
+          console.log("newTrim: " + newTrim);
+
+          // Color resizers red if at end of audio clip length
+          if (masterDuration - newTrim <= 0) {
             resizers.forEach(function(_resizer, _index, _arr) {
               const r = resizers[_index];
               if (r.classList.contains('side-right') || r.classList.contains('bottom-right')) {
@@ -628,37 +781,45 @@ function makeResizableDiv(div) {
               }
             });
           }
-        }
+        // }
+
       } // End Right Resizers Conditionals
+      // HANDLE LEFT RESIZER
       else if (currentResizer.classList.contains('bottom-left') || currentResizer.classList.contains('side-left')) {
+        // Get right edge position in pixels and parse
         let originalTrim = parseFloat(element.getBoundingClientRect().left);
+        if ( logLevel === "debug" ) console.log("originalTrim: " + originalTrim);
         if (originalTrim === '' || Number.isNaN(originalTrim)) {
-          originalTrim = minLeft; // 116
+          originalTrim = parseFloat(minLeft); // 116
         }
         // if ( logLevel === "debug" ) console.log("originalTrim: " + originalTrim);
-        const startTrim = parseFloat(element.dataset.startTrim);
-        // if ( logLevel === "debug" ) console.log("st: " + startTrim); //0
+        let startTrim = parseFloat(element.dataset.startTrim);
+        if ( logLevel === "debug" ) console.log("st: " + startTrim); //0
         let newTrim = 0.0;
 
         // get current mouse X position
         mouseX = e.pageX - mouseOffsetLeft; // current click-drag position
+
         // clamp mouseX to left edge of draggable area
         if (mouseX <= minLeft) {
           mouseX = minLeft;
         }
-        // if ( logLevel === "debug" ) console.log("mouseX: " + mouseX);
+        if ( logLevel === "debug" ) console.log("mouseX: " + mouseX);
+
+
         // calculate current resizable element width
-        const width = originalXRight - (mouseX);
-        // if ( logLevel === "debug" ) console.log("oxr: " + originalXRight);
-        // if ( logLevel === "debug" ) console.log("width: " + width);
+        let width = originalXRight - (mouseX);
+
         // Check if width is in bounds
-        if (width >= minimumSize && width <= maximumSize) {
-          // left = mouseX;
-          //
+        if (width < minimumSize){ width = minimumSize };
+        if (width > maximumSize){ width = maximumSize };
+        if ( logLevel === "debug" ) console.log("width: " + width);
+        // if (width >= minimumSize && width <= maximumSize) {
+          // Check if mouse is left of border
           if (mouseX < minLeft) {
             element.style.left = (mouseX - offsetX) + 'px'; // 116
             newTrim = startTrim;
-            // if ( logLevel === "debug" ) console.log("mouseX: " + mouseX + ", newTrim: " + newTrim);
+            // if ( logLevel === "debug" ) { console.log("mouseX: " + mouseX + ", newTrim: " + newTrim) };
             element.dataset.startTrim = newTrim;
           } else if (mouseX >= minLeft) {
             newTrim = (startTrim + masterDuration * ((mouseX - originalTrim) / maximumSize)).toFixed(4);
@@ -668,22 +829,24 @@ function makeResizableDiv(div) {
             } else if (newTrim <= 0) {
               newTrim = 0;
             }
-            // if ( logLevel === "debug" ) console.log("mouseX: " + mouseX + ", newTrim: " + newTrim);
+            // if ( logLevel === "debug" ){ console.log("mouseX: " + mouseX + ", newTrim: " + newTrim) };
 
             if (element.dataset.startTrim != newTrim && element.dataset.startTrim >= 0) {
               element.dataset.startTrim = newTrim;
+              // if ( logLevel === "debug") { console.log(element.style.left) };
               element.style.left = (mouseX - offsetX) + 'px';
-              // if ( logLevel === "debug" ) console.log("left: " + left);
+              // if ( logLevel === "debug" ) console.log("left: " + element.style.left);
               element.dataset.playheadOffset = parseFloat(((mouseX - minLeft) / maximumSize) * masterDuration);
               element.style.width = width + 'px';
               const bgPos = element.dataset.startTrim;
               // if ( logLevel === "debug" ) console.log(bgPos)
               element.querySelector('.waveform').style.backgroundPosition = -bgPos * 1.224 + 'px, 50%';
-              // if ( logLevel === "debug" ) console.log(newTrim.toFixed(2) + "px, 0px");
+              // if ( logLevel === "debug" ) { console.log(typeof(newTrim)) } ;
+              // if ( logLevel === "debug" ) { console.log("newTrim: " + parseFloat(newTrim).toFixed(2) + "px, 0px")};
             }
 
             // Color resizers red if at end of audio clip length
-            if (newTrim < 0.001) {
+            if (masterDuration - newTrim <= 0) {
               resizers.forEach(function(_resizer, _index, _arr) {
                 const r = resizers[_index];
                 if (r.classList.contains('side-left') || r.classList.contains('bottom-left')) {
@@ -699,7 +862,7 @@ function makeResizableDiv(div) {
               });
             }
           }
-        }
+        // }
       } // End Left Resizers Conditionals
 
       // if ( logLevel === "debug" ) console.log("exit endTrim: " + element.dataset.endTrim);
@@ -710,6 +873,11 @@ function makeResizableDiv(div) {
         _resizer.style.backgroundColor = originalColor;
       });
       window.removeEventListener('mousemove', resize);
+      console.log(element.dataset);
+      if (playAll.dataset.playing) {
+        pauseAllTracks();
+        playAllTracks();
+      }
     }
   }
 }
