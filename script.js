@@ -4,7 +4,7 @@ const logLevel = 'debug'; // debug // info // none //
 
 let ctx;
 
-const gainScale = 3;
+const gainScale = 3.4;
 
 let listener = '';
 
@@ -109,7 +109,7 @@ playAll.addEventListener('click', function() {
   playAllTracks();
 }, false);
 
-window.addEventListener('keydown', (event) => {
+window.addEventListener('keyup', (event) => {
   if (event.keyCode === 32) {
     // if ( logLevel === "debug" ) console.log('pressed spacebar')
     if (playAll.dataset.playing === 'false') {
@@ -172,10 +172,18 @@ returnAll.addEventListener('touchstart', (event) => {
 // /Add event listeners for gain and pan changes
 // Gain Sliders
 volumeControlAll.addEventListener('input', function() {
-  gainNodeAll.gain.linearRampToValueAtTime(this.value**2 * gainScale, ctx.currentTime + 0.001);
+  gainNodeAll.gain.linearRampToValueAtTime(this.value**1 * gainScale, ctx.currentTime + 0.001);
   playAll.dataset.baseGain = this.value;
   console.log("VCA baseGain: " + playAll.dataset.baseGain);
   masterGainAutomationCurve = fadeInAllAutomationHandler(masterGainAutomationCurve, fadeInAll.value, fadeOutAll.value, playAll.dataset.baseGain);
+}, false);
+
+volumeControlAll.addEventListener('onchange', function() {
+  playAll.dataset.volumeChanging = 'true';
+}, false);
+
+volumeControlAll.addEventListener('mouseup', function() {
+  playAll.dataset.volumeChanging = 'false';
 }, false);
 
 panControlAll.addEventListener('input', function() {
@@ -261,6 +269,11 @@ function updatePlayheadTime(_displayElement, _increment, _buttons) {
           _displayElement.innerHTML = formatTime(playheadTime * 1000);
           const newPlayheadTime = parseFloat(playheadTime.toFixed(3));
 
+          if (playAll.dataset.volumeChanging == 'false' ) {
+            masterGainAutomationCurve = fadeInAllAutomationHandler(masterGainAutomationCurve, fadeInAll.value, fadeOutAll.value, playAll.dataset.baseGain);
+            volumeControlAll.value = masterGainAutomationCurve[Math.ceil(playheadTime)]
+          }
+
           if (playheadSliderJustClicked = 'false') {
             playheadSlider.value = newPlayheadTime;
           // playheadOffset.value = newPlayheadTime;
@@ -276,10 +289,11 @@ function updatePlayheadTime(_displayElement, _increment, _buttons) {
             }
           } else {
             playheadRunning = 'false';
+            volumeControlAll.value = playAll.dataset.baseGain;
           // if ( logLevel === "debug" ) console.log('inner playhead time: ' + playheadTime);
           }
-          masterGainAutomationCurve = fadeInAllAutomationHandler(masterGainAutomationCurve, fadeInAll.value, fadeOutAll.value, playAll.dataset.baseGain);
-          volumeControlAll.value = masterGainAutomationCurve[Math.ceil(playheadTime)]
+
+
 
 
         }, _increment);
@@ -437,7 +451,7 @@ function playAllTracks() {
       let automationOffset = Math.ceil(playheadStartTime);
 
       gainNodeAll.gain.cancelScheduledValues(ctx.currentTime)
-      gainNodeAll.gain = masterGainAutomationCurve[automationOffset]**2 * gainScale;
+      gainNodeAll.gain = masterGainAutomationCurve[automationOffset]**1 * gainScale;
 
       masterGainAutomationCurve = fadeInAllAutomationHandler(masterGainAutomationCurve, fadeInAll.value, fadeOutAll.value, playAll.dataset.baseGain);
       console.log(masterGainAutomationCurve);
@@ -448,7 +462,7 @@ function playAllTracks() {
 
         //console.log("i + pst: " + i + " : " + playheadStartTime);
 
-        gainNodeAll.gain = masterGainAutomationCurve[automationOffset]**2 * gainScale;
+        gainNodeAll.gain = masterGainAutomationCurve[automationOffset]**1 * gainScale;
         //console.log("automationOffset: " + automationOffset);
         // if (i == 353) {
         //   gainNodeAll.gain.cancelScheduledValues(ctx.currentTime);
@@ -456,9 +470,9 @@ function playAllTracks() {
         // } else
         if (i == automationOffset ) {
           gainNodeAll.gain.cancelScheduledValues(ctx.currentTime);
-          gainNodeAll.gain.setValueAtTime(masterGainAutomationCurve[i]**2 * gainScale, ctx.currentTime);
+          gainNodeAll.gain.setValueAtTime(masterGainAutomationCurve[i]**1 * gainScale, ctx.currentTime);
         } else if (i > automationOffset ) {
-          gainNodeAll.gain.linearRampToValueAtTime(masterGainAutomationCurve[i]**2 * gainScale, ctx.currentTime + i - automationOffset);
+          gainNodeAll.gain.linearRampToValueAtTime(masterGainAutomationCurve[i]**1 * gainScale, ctx.currentTime + i - automationOffset);
         } else if (i <= automationOffset) {
           //console.log("Skipping automation for past node: " + i + " : " + masterGainAutomationCurve[i] * gainScale);
         } else {
@@ -536,6 +550,7 @@ function playAllTracks() {
 }
 
 function pauseAllTracks() {
+
   urls.forEach(function(_url, _index, _urls) {
     try {
       sources[_index].stop();
@@ -547,14 +562,18 @@ function pauseAllTracks() {
     // if ( logLevel === "debug" ) console.log(volumeControls[_index].value)
     gainNodes[_index].gain.setValueAtTime(volumeControls[_index].value, ctx.currentTime);
   });
+
   gainNodeAll.gain.cancelScheduledValues(ctx.currentTime);
-  gainNodeAll.gain.setValueAtTime(volumeControlAll.value**2 * gainScale, ctx.currentTime);
+  gainNodeAll.gain = playAll.dataset.baseGain**1 * gainScale;
+  volumeControlAll.value = playAll.dataset.baseGain;
+
   if (playAll.dataset.playing == 'true') {
     playAll.dataset.playing = 'false';
     playheadRunning = 'false';
   } else {
     // if ( logLevel === "debug" ) console.log('Audio is not currently playing')
   }
+
 }
 
 function cacheGainValues (_gainCache) {
