@@ -1,6 +1,6 @@
 // Web Audio Code
 
-const logLevel = 'debug'; // debug // info // none //
+const logLevel = 'info'; // debug // info // none //
 
 let ctx;
 
@@ -232,6 +232,32 @@ function init() {
     }
   }
   // Add event listeners for audio data loaded and populate duration elements
+  // Get the modal
+  var modal = document.getElementById("myModal");
+
+  // Get the button that opens the modal
+  var btn = document.getElementById("myBtn");
+
+  // Get the <span> element that closes the modal
+  var span = document.getElementsByClassName("close")[0];
+
+  // When the user clicks the button, open the modal
+  btn.onclick = function() {
+    modal.style.display = "block";
+  }
+
+  // When the user clicks on <span> (x), close the modal
+  span.onclick = function() {
+    modal.style.display = "none";
+  }
+
+  // When the user clicks anywhere outside of the modal, close it
+  window.onclick = function(event) {
+    if (event.target == modal) {
+      modal.style.display = "none";
+    }
+  }
+  //alert("Note for beginners: First, listen to the piece as it is by playing the master track. Then try “trimming” different elements and moving them from their current positions by dragging the waveform. After that, you can try fader controls and volume to shape each track.")
 }
 
 function finishedLoading(bufferList) {
@@ -364,12 +390,17 @@ function createSource(_index, _node) {
 }
 
 function playTrack(_index, _playheadOffset) {
+  if ( logLevel === "debug" ) { console.log("Playing track: " + _index); }
+
   resumeContext();
   createSource(_index, panNodes[_index]);
+
   let currentTrack = document.querySelector('#track' + _index);
   let trackOffset = parseFloat(currentTrack.dataset.playheadOffset);
   let trackStartTrim = parseFloat(currentTrack.dataset.startTrim);
   let trackEndTrim = parseFloat(currentTrack.dataset.endTrim);
+
+  console.log(currentTrack.dataset);
 
   let wh = ctx.currentTime + trackOffset - _playheadOffset;
   if (wh < 0) {
@@ -399,15 +430,25 @@ function playTrack(_index, _playheadOffset) {
   // HANDLE FADES
   // if ( logLevel === "debug" ) { console.log('FadeIn Index: ' + _index); }
   if (fadeIns[_index].value > 0) {
-      if ( logLevel === "debug" ) { console.log('fading in track ' + _index); }
+      if ( logLevel === "debug" ) { console.log('Fading in track ' + _index); }
     try {
-      gainNodes[_index].gain.linearRampToValueAtTime(0, ctx.currentTime);
+      gainNodes[_index].gain.cancelScheduledValues(ctx.currentTime);
+      gainNodes[_index].gain.setValueAtTime(0, ctx.currentTime);
+      gainNodes[_index].gain.setValueAtTime(0, wh);
+      console.log("wh: " + wh);
+      console.log(gainNodes[_index].gain.value);
       // if ( logLevel === "debug" ) { console.log("resetGain: " + gainNodes[_index].gain.value); }
-      gainNodes[_index].gain.linearRampToValueAtTime(volumeControls[_index].value * gainScale, wh + parseFloat(fadeIns[_index].value), 0.8);
+      if ( _playheadOffset < parseFloat(fadeIns[_index].value) ) {
+        gainNodes[_index].gain.linearRampToValueAtTime(volumeControls[_index].value**2 * gainScale, wh + parseFloat(fadeIns[_index].value));
+      } else {
+        gainNodes[_index].gain.linearRampToValueAtTime(volumeControls[_index].value**2 * gainScale, wh + .1);
+      }
+      console.log(gainNodes[_index].gain.value);
+
     } catch (error) {
-      // if ( logLevel === "debug" ) { console.log('track_' + [_index] + 'fade in: ' + error); }
+      if ( logLevel === "debug" ) { console.log('track_' + [_index] + 'fade in: ' + error); }
       console.log(error);
-      gainNodes[_index].gain.setValueAtTime(volumeControls[_index].value * gainScale, ctx.currentTime);
+      gainNodes[_index].gain.setValueAtTime(volumeControls[_index].value**2 * gainScale, ctx.currentTime);
     }
   }
 
@@ -416,7 +457,12 @@ function playTrack(_index, _playheadOffset) {
   if (fadeOuts[_index].value > 0) {
       if ( logLevel === "debug" ) { console.log('fading out track ' + _index); }
     try {
-      gainNodes[_index].gain.linearRampToValueAtTime(0.0, wh + dur - parseFloat(fadeOuts[_index].value), 0.8);
+      if (masterDuration - _playheadOffset > parseFloat(fadeOuts[_index].value)) {
+        gainNodes[_index].gain.linearRampToValueAtTime(0.0, wh + dur - parseFloat(fadeOuts[_index].value));
+      } else {
+        let fadeLerp = (masterDuration - _playheadOffset) / parseFloat(fadeOuts[_index].value);
+        gainNodes[_index].gain.linearRampToValueAtTime(volumeControls[_index].value * gainScale * fadeLerp, wh + dur);
+      }
     } catch (error) {
       console.log(error);
       // if ( logLevel === "debug" ) { console.log('track_' + [_index] + 'fade out: ' + error); }

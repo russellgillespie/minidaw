@@ -45,7 +45,32 @@
           </div>
         </div>
         <div class="column tutorial" id="legend-region">
-          <div class="row legend-header"> Audio Clip Controls </div>
+          <!-- <div class="row legend-header"> Audio Clip Controls </div> -->
+          <div class="row tutorial legend-header" id="tutorial">
+            <!-- Trigger/Open The Modal -->
+            <button id="myBtn">Show Tutorial</button>
+
+            <!-- The Modal -->
+            <div id="myModal" class="modal">
+
+              <!-- Modal content -->
+              <div class="modal-content">
+                <div class="modal-header">
+                  <span class="close">&times;</span>
+                  <h2>miniDAW: How to Use</h2>
+                </div>
+                <div class="modal-body">
+                  <p>Note for beginners:</p>
+                  <p>• First, listen to the piece as it is by playing the master track.</p>
+                  <p>• Then try “trimming” different elements and moving them from their current positions by dragging the waveform.</p>
+                  <p>• After that, you can try fader controls and volume to shape each track.</p>
+                </div>
+                <div class="modal-footer">
+                  <p></p>
+                </div>
+              </div>
+            </div>
+          </div>
           <div class="row" id="legend-resizer">
             <img class="row" id="legend-trim" src="./img/resizer.png"></img>
             <label class="legend-label" for="legend-return">Trim clip start/end</label>
@@ -59,6 +84,7 @@
             <label class="legend-label" for="legend-play">Audio waveform</label>
           </div>
         </div>
+
       </div>
       <!-- TRACK 0 -->
       <div class="row track-row" id="row0">
