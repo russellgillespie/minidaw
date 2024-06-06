@@ -1,6 +1,6 @@
 // Web Audio Code
 
-const logLevel = 'info'; // debug // info // none //
+const logLevel = 'debug'; // debug // info // none //
 
 let ctx;
 
@@ -230,6 +230,12 @@ function init() {
     if (currentTrack.dataset.endTrim === undefined) {
       currentTrack.dataset.endTrim = masterDuration;
     }
+    if (currentTrack.dataset.trimmedStart === undefined) {
+      currentTrack.dataset.trimmedStart = 0.0;
+    }
+    if (currentTrack.dataset.trimmedEnd === undefined) {
+      currentTrack.dataset.trimmedEnd = 0.0;
+    }
   }
   // Add event listeners for audio data loaded and populate duration elements
   // Get the modal
@@ -269,7 +275,11 @@ function finishedLoading(bufferList) {
     sources[_index].connect(ctx.destination);
   });
   loaded = true;
+  bufferList.forEach(function(_buffer, _index, _bufferlist) {
+  });
 }
+
+
 
 function initRouting() {
   // Create Master Gain Node and Pan Node then connect
@@ -390,7 +400,7 @@ function createSource(_index, _node) {
 }
 
 function playTrack(_index, _playheadOffset) {
-  if ( logLevel === "debug" ) { console.log("Playing track: " + _index); }
+  if ( logLevel === "info" ) { console.log("Playing track: " + _index); }
 
   resumeContext();
   createSource(_index, panNodes[_index]);
@@ -399,8 +409,7 @@ function playTrack(_index, _playheadOffset) {
   let trackOffset = parseFloat(currentTrack.dataset.playheadOffset);
   let trackStartTrim = parseFloat(currentTrack.dataset.startTrim);
   let trackEndTrim = parseFloat(currentTrack.dataset.endTrim);
-
-  console.log(currentTrack.dataset);
+  // console.log(currentTrack.dataset);
 
   let wh = ctx.currentTime + trackOffset - _playheadOffset;
   if (wh < 0) {
@@ -472,13 +481,13 @@ function playTrack(_index, _playheadOffset) {
 }
 
 function pauseTrack(_index) {
-  if ( logLevel === "debug" ) { console.log('pausing track ' + _index); }
+  if ( logLevel === "info" ) { console.log('pausing track ' + _index); }
   sources[_index].stop();
 }
 
 // Handle pressing of the playAllTracks Button
 function playAllTracks() {
-  if ( logLevel === "debug" ) { console.log('playAllTracks function running'); }
+  if ( logLevel === "info" ) { console.log('playAllTracks function running'); }
   // Check if audio files have fully loaded otherwise alert user to wait
   if (loaded) {
     // Check whether there is audio currently playing
@@ -505,7 +514,7 @@ function playAllTracks() {
 
       gainNodeAll.gain.cancelScheduledValues(ctx.currentTime);
       try {
-        console.log(masterGainAutomationCurve[automationOffset]);
+        // console.log(masterGainAutomationCurve[automationOffset]);
         if (masterDuration - automationOffset > 0) {
           gainNodeAll.gain.linearRampToValueAtTime(masterGainAutomationCurve[automationOffset]**1 * gainScale, ctx.currentTime + .1);
         }
@@ -524,7 +533,7 @@ function playAllTracks() {
 
         //gainNodeAll.gain.linearRampToValueAtTime(masterGainAutomationCurve[automationOffset]**1 * gainScale, ctx.currentTime + .1);
         try {
-          console.log(masterGainAutomationCurve[automationOffset]);
+          // console.log(masterGainAutomationCurve[automationOffset]);
           if (masterDuration - automationOffset > 0) {
             gainNodeAll.gain.linearRampToValueAtTime(masterGainAutomationCurve[automationOffset]**1 * gainScale, ctx.currentTime + .1);
           }
@@ -619,7 +628,7 @@ function playAllTracks() {
 }
 
 function pauseAllTracks() {
-  if ( logLevel === "debug" ) { console.log('Pausing all tracks'); }
+  if ( logLevel === "info" ) { console.log('Pausing all tracks'); }
 
   urls.forEach(function(_url, _index, _urls) {
     try {
@@ -634,7 +643,7 @@ function pauseAllTracks() {
   });
 
   gainNodeAll.gain.cancelScheduledValues(ctx.currentTime);
-  console.log(playAll.dataset.baseGain);
+  // console.log(playAll.dataset.baseGain);
   gainNodeAll.gain.linearRampToValueAtTime(playAll.dataset.baseGain**1 * gainScale, ctx.currentTime + .1);
   if (playAll.dataset.volumeChanging == 'false' ) {
     volumeControlAll.value = playAll.dataset.baseGain;
@@ -669,7 +678,7 @@ function pauseAllTracks() {
 // }
 
 function fadeInAllAutomationHandler (_automationArray, _fadeInTime, _fadeOutTime, _gain=0.5) {
-  if ( logLevel === "debug" ) { console.log("Populating automation array buffer"); }
+  if ( logLevel === "info" ) { console.log("Populating automation array buffer"); }
   _automationArray.forEach((item, i) => {
     if (i < _fadeInTime && _fadeInTime > 0) {
       _automationArray[i] = parseFloat(_gain * i  / fadeInAll.value).toFixed(2);
@@ -687,7 +696,7 @@ function fadeInAllAutomationHandler (_automationArray, _fadeInTime, _fadeOutTime
 }
 
 function unlockAudioContext(ctx) {
-  if ( logLevel === "debug" ) { console.log('unlocking audioContext'); }
+  if ( logLevel === "info" ) { console.log('unlocking audioContext'); }
   if (ctx.state !== 'suspended') return;
   const b = document.body;
   const events = ['touchstart', 'touchend', 'mousedown', 'keydown'];
@@ -702,7 +711,7 @@ function unlockAudioContext(ctx) {
 
 // Function for managing moveable regions
 function makeMoveableDiv(div) {
-  if ( logLevel === "debug" ) { console.log('enabling region div move'); }
+  if ( logLevel === "info" ) { console.log('enabling region div move'); }
   const offsetX = document.querySelector('.daw-wrapper').offsetLeft;
   const movers = document.querySelectorAll(div);
   let currentMover = '';
@@ -726,7 +735,7 @@ function makeMoveableDiv(div) {
   }
 
   function moveDiv(e) {
-    if ( logLevel === "debug" ) { console.log('moving region div'); }
+    if ( logLevel === "info" ) { console.log('moving region div'); }
     let newPos = parseInt(originalXLeft - (originalMouseX - e.pageX) - offsetX);
     const moverWidth = parseFloat(getComputedStyle(currentMover, null).getPropertyValue('width').replace('px', ''));
     // if ( logLevel === "debug" ) { console.log("moverWidth: " + moverWidth); }
@@ -750,7 +759,7 @@ function makeMoveableDiv(div) {
   }
 
   function stopMoveDiv() {
-    if ( logLevel === "debug" ) { console.log('stopping region div move'); }
+    if ( logLevel === "info" ) { console.log('stopping region div move'); }
 
     window.removeEventListener('mousemove', moveDiv);
   }
@@ -758,7 +767,7 @@ function makeMoveableDiv(div) {
 
 // Function for managing resizeable regions
 function makeResizableDiv(div) {
-  if ( logLevel === "debug" ) { console.log('enabling region div resizing'); }
+  if ( logLevel === "info" ) { console.log('enabling region div resizing'); }
 
   const offsetX = document.querySelector('.daw-wrapper').offsetLeft;
   const element = document.querySelector(div);
@@ -774,6 +783,14 @@ function makeResizableDiv(div) {
   let originalMouseX = 0;
   let mouseOffsetRight = 0;
   let mouseOffsetLeft = 0;
+  let cacheTrim = 0;
+  let total = parseFloat(element.dataset.endTrim) + parseFloat(element.dataset.trimmedEnd);
+
+  // let newDataPlayhead = element.dataset.playheadOffset;
+  // let newDataStartTrim = element.dataset.startTrim;
+  // let newDataEndTrim = element.dataset.endTrim;
+  // let newDataTrimmedEnd = element.dataset.trimmedEnd;
+  // let newDataTrimmedStart = element.dataset.trimmedStart;
 
   let originalColor = '';
   const errorColor = '#bc1413';
@@ -803,7 +820,7 @@ function makeResizableDiv(div) {
     });
 
     function resize(e) {
-    if ( logLevel === "debug" ) { console.log('resizing region div'); }
+    if ( logLevel === "info" ) { console.log('resizing region div'); }
 
       let mouseX = 0;
       //console.log("mouseX: " + mouseX);
@@ -812,64 +829,94 @@ function makeResizableDiv(div) {
 
       // HANDLE RIGHT RESIZER
       if (currentResizer.classList.contains('bottom-right') || currentResizer.classList.contains('side-right')) {
-        if ( logLevel === "debug" ) { console.log('handling right resizer'); }
+        if ( logLevel === "info" ) { console.log('handling right resizer'); }
+
         // Get right edge position in pixels and parse
-        let originalTrim = parseFloat(element.style.right); // 548 offsetX + minLeft + max_width
-        if ( logLevel === "debug" ) { console.log("originalTrim: " + originalTrim); }
-        if (Number.isNaN(originalTrim)) {
-          originalTrim = parseFloat(maxRight); // 548
+        let originalResizerPos = parseFloat(element.style.right); // 548 offsetX + minLeft + max_width
+        if ( logLevel === "debug" ) { console.log("originalResizerPos: " + originalResizerPos); }
+
+        if (Number.isNaN(originalResizerPos)) {
+          originalResizerPos = parseFloat(maxRight); // 548
+
         }
         // Get current clip's trimmed duration in seconds
-        let startTrim = parseFloat(element.dataset.endTrim); // 90
-        // console.log("startTrim: " + startTrim);
+        cacheTrim = parseFloat(element.dataset.endTrim); // 90
+        console.log("startTrim: " + cacheTrim);
         let newTrim = 0.0; // initialize new trim variable
 
         // get current mouse X position
         mouseX = e.pageX + mouseOffsetRight; // current click-drag position
-
         // Clamp mouse position input to right edge
         if (mouseX > maxRight) {
           mouseX = maxRight;
         }
-        // if ( logLevel === "debug" ) { console.log("mouseX: " + mouseX); }
+        if ( logLevel === "debug" ) { console.log("mouseX: " + mouseX); }
+
         originalMouseX = originalXRight;
         // if ( logLevel === "debug" ) { console.log("ogMouseX: " + originalMouseX); }
         // Calculate new width of div
         let width = originalWidth - (originalXRight - mouseX);
 
+
         // Check if width is in bounds
-        if (width < minimumSize){ width = minimumSize }
-        if (width > maximumSize){ width = maximumSize }
+        if (width < minimumSize) {
+          width = minimumSize
+        }
+        if (width > maximumSize) {
+          width = maximumSize
+        }
         // if ( logLevel === "debug" ) { console.log("width: " + width); }
-        //if (width >= minimumSize && width <= maximumSize) {
+        if (width >= minimumSize && width <= maximumSize) {
 
           // Trim duration if not exceeding max time
-          if (startTrim <= 0) {
-            startTrim = 0;
-          } else if (startTrim >= masterDuration) {
-            startTrim = masterDuration;
+          if (cacheTrim <= 0) {
+            cacheTrim = 0;
+          } else if (cacheTrim >= masterDuration) {
+            cacheTrim = masterDuration;
           }
-          // if ( logLevel === "debug" ) { console.log("start trim: " + startTrim); }
-          newTrim = parseFloat(startTrim - (originalTrim - mouseX) * (masterDuration  / maximumSize));
+          if ( logLevel === "debug" ) { console.log("cacheTrim: " + cacheTrim); }
+          newTrim = parseFloat(cacheTrim - (originalResizerPos - mouseX) * (masterDuration  / maximumSize));
 
-          // console.log("startTrim: " + startTrim);
+          // console.log("startTrim: " + cacheTrim);
           // console.log("masterDuration: " + masterDuration);
-          // console.log("originalTrim: " + originalTrim);
+          // console.log("originalResizerPos: " + originalResizerPos);
           // console.log("mouseX: " + mouseX);
           // console.log("maximumSize: " + maximumSize);
           // console.log("newTrim: " + newTrim);
 
-          // console.log("newTrim: " + newTrim);
           // If trim is in bounds apply resize transformation
-          if (newTrim <= masterDuration && newTrim >= 0) {
-            element.dataset.endTrim = newTrim;
+          if (newTrim <= masterDuration ) {
+            element.dataset.endTrim = newTrim
+            console.log("te: " + element.dataset.trimmedEnd);
+            element.dataset.trimmedEnd = parseFloat(element.dataset.trimmedEnd) + (cacheTrim - newTrim);
 
+            console.log("newTrim: " + newTrim);
+            console.log("trimmedEnd: " + parseFloat(element.dataset.trimmedEnd));
+
+            total = parseFloat(element.dataset.trimmedEnd) + parseFloat(element.dataset.endTrim)
+            console.log("Total: " + total);
+            // newDataEndTrim = newTrim;
           }
-          if (newTrim >= masterDuration - 1) { newTrim = masterDuration }
-          if (newTrim <= 1 ) { newTrim = 0 }
-          element.style.width = width + 'px';
-          element.style.right = originalXLeft + width + 'px';
-          // console.log("newTrim: " + newTrim);
+
+          // if (newTrim >= masterDuration - 0.5) {
+          //    newTrim = masterDuration
+          //  }
+          // if (newTrim <= 0.5) {
+          //   newTrim = 0
+          // }
+
+
+          //
+          // if ( total <= masterDuration && parseFloat(element.dataset.trimmedEnd) >= 0){
+          if (newTrim < masterDuration) {
+            element.style.width = width + 'px';
+            element.style.right = originalXLeft + width + 'px';
+            // console.log("newTrim: " + newTrim);
+          }
+
+          if (mouseX = maxRight && e.pageX + mouseOffsetRight > maxRight) {
+            width = maxRight - element.style.left;
+          }
 
           // Color resizers red if at end of audio clip length
           if (masterDuration - newTrim <= 0) {
@@ -887,22 +934,22 @@ function makeResizableDiv(div) {
               }
             });
           }
-        // }
+        }
 
       } // End Right Resizers Conditionals
       // HANDLE LEFT RESIZER
       else if (currentResizer.classList.contains('bottom-left') || currentResizer.classList.contains('side-left')) {
-        if ( logLevel === "debug" ) { console.log('handling left resizer'); }
+        if ( logLevel === "info" ) { console.log('handling left resizer'); }
 
         // Get right edge position in pixels and parse
-        let originalTrim = parseFloat(element.getBoundingClientRect().left);
-        // if ( logLevel === "debug" ) { console.log("originalTrim: " + originalTrim); }
-        if (originalTrim === '' || Number.isNaN(originalTrim)) {
-          originalTrim = parseFloat(minLeft); // 116
+        let originalResizerPos = parseFloat(element.getBoundingClientRect().left);
+        // if ( logLevel === "debug" ) { console.log("originalResizerPos: " + originalResizerPos); }
+        if (originalResizerPos === '' || Number.isNaN(originalResizerPos)) {
+          originalResizerPos = parseFloat(minLeft); // 116
         }
-        // if ( logLevel === "debug" ) { console.log("originalTrim: " + originalTrim); }
-        let startTrim = parseFloat(element.dataset.startTrim);
-        // if ( logLevel === "debug" ) { console.log("st: " + startTrim); } //0
+        // if ( logLevel === "debug" ) { console.log("originalResizerPos: " + originalResizerPos); }
+        let cacheTrim = parseFloat(element.dataset.startTrim);
+        // if ( logLevel === "debug" ) { console.log("st: " + cacheTrim); } //0
         let newTrim = 0.0;
 
         // get current mouse X position
@@ -921,16 +968,21 @@ function makeResizableDiv(div) {
         // Check if width is in bounds
         if (width < minimumSize){ width = minimumSize }
         if (width > maximumSize){ width = maximumSize }
-        // if ( logLevel === "debug" ) { console.log("width: " + width); }
+        if ( logLevel === "debug" ) { console.log("width: " + width); }
+
         // if (width >= minimumSize && width <= maximumSize) {
           // Check if mouse is left of border
           if (mouseX < minLeft) {
+            // set left edge of region div to left border of track arrange area
             element.style.left = (mouseX - offsetX) + 'px'; // 116
-            newTrim = startTrim;
+            // cache new trim value
+            newTrim = cacheTrim;
             // if ( logLevel === "debug" ) { console.log("mouseX: " + mouseX + ", newTrim: " + newTrim); }
+            // Set audio buffer's endpoint trim data
             element.dataset.startTrim = newTrim;
-          } else if (mouseX >= minLeft) {
-            newTrim = (startTrim + masterDuration * ((mouseX - originalTrim) / maximumSize)).toFixed(4);
+            // Check if mouse is within the left border
+          } else if (mouseX >= minLeft && mouseX + minimumSize <= maximumSize) {
+            newTrim = (cacheTrim + masterDuration * ((mouseX - originalResizerPos) / maximumSize)).toFixed(4);
             // clamp trim to master duration range
             if (newTrim > masterDuration) {
               newTrim = masterDuration;
@@ -944,6 +996,7 @@ function makeResizableDiv(div) {
               // if ( logLevel === "debug") { console.log(element.style.left); }
               element.style.left = (mouseX - offsetX) + 'px';
               // if ( logLevel === "debug" ) { console.log("left: " + element.style.left); }
+
               element.dataset.playheadOffset = parseFloat(((mouseX - minLeft) / maximumSize) * masterDuration);
               element.style.width = width + 'px';
               const bgPos = element.dataset.startTrim;
@@ -977,7 +1030,7 @@ function makeResizableDiv(div) {
     } // End function resize
 
     function stopResize() {
-      if ( logLevel === "debug" ) { console.log('stopping resize'); }
+      if ( logLevel === "info" ) { console.log('stopping resize'); }
       resizers.forEach(function(_resizer, _index, _arr) {
         _resizer.style.backgroundColor = originalColor;
       });
@@ -992,12 +1045,20 @@ function makeResizableDiv(div) {
   }
 }
 
+function updateTrackDataset(_element, _playheadOffset, _startTrim, _endTrim) {
+  _element.dataset.playheadOffset = _playheadOffset;
+  _element.dataset.startTrim = _startTrim;
+  _element.dataset.endTrim = _endTrim;
+
+  if ( logLevel === "debug" ) { console.log(_element.dataset); }
+}
+
 
 // // Initialize App
 const tracks = ['track0', 'track1', 'track2', 'track3', 'track4'];
 
 window.onload = function() {
-  if ( logLevel === "debug" ) { console.log('window did load'); }
+  if ( logLevel === "info" ) { console.log('window did load'); }
   init();
   for (let i = 0; i < tracks.length; i++) {
     const div = tracks[i];
